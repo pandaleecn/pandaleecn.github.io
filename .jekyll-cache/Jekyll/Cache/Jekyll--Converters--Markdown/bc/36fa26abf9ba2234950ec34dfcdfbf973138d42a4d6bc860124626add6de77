@@ -1,0 +1,37 @@
+I"g<h3 id="1-afnetworking">1. AFNetworking</h3>
+<ul>
+  <li>iOS客户端第三方网络框架</li>
+  <li>框架图
+<img src="http://files.pandaleo.cn/ac13180141824eba476dbf29c7cfa7f5.png?imageMogr2/thumbnail/!50p" alt="" />
+    <ul>
+      <li>会话，NSURLSession</li>
+      <li>网络监听模块，监听网络变化</li>
+      <li>网络安全模块</li>
+      <li>请求序列化封装</li>
+      <li>响应序列化封装</li>
+      <li>UIKit集成模块，原生控件分类的添加</li>
+    </ul>
+  </li>
+  <li>主要类关系图
+<img src="http://files.pandaleo.cn/d3cef249cf0c3655fb144cb52a718209.png?imageMogr2/thumbnail/!50p" alt="" />
+    <ul>
+      <li>AFURLSessionManager，核心类</li>
+      <li>AFHTTPSessionManager，实际应用中使用频度最高</li>
+      <li>AFURLRequestSerialzation，根据传递参数拼接出最终结果</li>
+      <li>AFURLResponseSerialzation，解析网络请求的返回结果。如：JSON字符串，通过这个类，内部调用系统JSON解析相关类方法，解析出想要的结果；图片数据，通过ImageWithData产生UIImage结果。</li>
+      <li>NSURLSession，会话模块</li>
+      <li>AFSecurityPolicy，保障网络安全，包括证书和其他验证</li>
+      <li>AFNetworkReachabilityManager，监听网络连接，和系统第三方库Reachability功能相同</li>
+    </ul>
+  </li>
+  <li>AFURLSessionManager主要工作
+    <ul>
+      <li>创建和管理NSURLSession、调用系统API生成NSURLSessionTask，NSURLSessionTask对应一个网络请求</li>
+      <li>实现NSURLSessionDelegate等协议的代理方法，处理请求过程中网络请求数据、重定向等情况</li>
+      <li>引入AFsecurityPolicy保证请求安全，包含证书校验、公钥认证等</li>
+      <li>引入AFNetworkReachabilityManager监控网络状态</li>
+    </ul>
+  </li>
+  <li>发送一个Get方式的HTTP请求</li>
+</ul>
+:ET

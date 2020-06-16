@@ -1,0 +1,8 @@
+I"H<h4 id="1-uiview和calayer">1. UIView和CALayer</h4>
+<p><img src="http://files.pandaleo.cn/6f98aa0d807f0706212bc22fde278ae6.png" alt="" /></p>
+<ul>
+  <li>UIView为其提供内容，一级负责处理触摸等事件，参与响应链</li>
+  <li>CALayer负责内容contents</li>
+  <li>遵循单一职责的设计原则</li>
+</ul>
+:ET

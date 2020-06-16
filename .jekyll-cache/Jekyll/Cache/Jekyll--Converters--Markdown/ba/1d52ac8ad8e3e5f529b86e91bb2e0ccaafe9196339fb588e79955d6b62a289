@@ -1,0 +1,12 @@
+I"|<h3 id="一-图像显示原理">一、 图像显示原理</h3>
+<p><img src="http://files.pandaleo.cn/4f1ccc0693fea0c9b3c5b494204a5098.png" alt="" />
+<img src="http://files.pandaleo.cn/296c397c94e5f475096c739af8184e9e.png" alt="" /></p>
+<h4 id="1-cpu工作">1. CPU工作</h4>
+<p><img src="http://files.pandaleo.cn/61ddb39294c44486bf9b60c925ccd0d0.png" alt="" /></p>
+<ul>
+  <li>Layout: UI布局、文本计算，frame的设置、label的文字、size的计算</li>
+  <li>Display：绘制，drewrect</li>
+  <li>Prepare：图片编解码，UImageView设置Image显示前的解码</li>
+  <li>Commit：提交位图，CoreAnimation</li>
+</ul>
+:ET

@@ -1,0 +1,26 @@
+I"<h4 id="1-类class中的属性property">1. 类Class中的属性property</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface ViewController : UIViewController
+{
+    NSString *text;
+}
+@property (nonatomic,copy)NSString *str;
+@end
+</code></pre></div></div>
+<ul>
+  <li>@property声明属性时，自动生成：带有下划线的实例变量、setter和getter方法；</li>
+  <li>_text，实例变量只能通过下划线调用，不会自动生成setter和getter方法；</li>
+  <li>@synthesize str = _text，可重新对实例变量命名。</li>
+</ul>
+
+<h4 id="2-类别catagory中的属性property">2. 类别Catagory中的属性property</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface UIViewController (UINavigationControllerItem)
+@property(nonatomic,readonly,retain) UINavigationItem *navigationItem;
+@property(nonatomic) BOOL hidesBottomBarWhenPushed;
+@property(nonatomic,readonly,retain) UINavigationController *navigationController;
+@end
+</code></pre></div></div>
+<ul>
+  <li>这里添加的属性，不会自动生成实例变量，这里添加的属性其实是添加的getter与setter方法。</li>
+  <li>匿名类别(匿名扩展)是可以添加实例变量的，非匿名类别是不能添加实例变量的，只能添加方法，或者属性（其实也是方法）。内明类别：也就值在.m文件中调用声明 ，为了防止别人使用你的变量和方法，同样你包含了什么类也不希望别人知道，也要放在.m中</li>
+</ul>
+:ET

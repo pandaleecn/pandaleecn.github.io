@@ -1,0 +1,10 @@
+I"q<h4 id="1-内存布局">1. 内存布局</h4>
+<p><img src="http://files.pandaleo.cn/c70625807583c303e1167dbcfc351066.png" alt="" /></p>
+<ul>
+  <li>stack：方法调用。</li>
+  <li>heap：通过alloc等分配的对象。</li>
+  <li>bss：未初始化的全局变量等。</li>
+  <li>data：已初始化的全局变量等。</li>
+  <li>text：程序代码。</li>
+</ul>
+:ET

@@ -1,0 +1,684 @@
+I"&^<p>结构体和类的主要不同点</p>
+<ul>
+  <li>结构体 (和枚举) 是值类型，而类是引用类型。在设计结构体时，编译器可以保证不可变性，类不行。</li>
+  <li>内存的管理方式有所不同。结构体可以被直接持有及访问，但是类的实例只能通过引用来间接地访问。结构体不会被引用，但是会被复制。也就是说，结构体的持有者是唯一的，但是类的实例却能有很多个持有者。</li>
+  <li>使用类，我们可以通过继承来共享代码。而结构体 (以及枚举) 是不能被继承的。想要在不同的结构体或者枚举之间共享代码，我们需要使用不同的技术，比如像是组合、泛型以及协议扩展等。</li>
+</ul>
+
+<h3 id="一值类型">一、值类型</h3>
+<ul>
+  <li>引用类型，具有生命周期，使用时检查两者的内存地址是否一样，如：文件句柄，通知中心，网络接口，数据库连接，view controller。</li>
+  <li>值类型，不需要生命周期，销毁时不需要额外操作（对比文件句柄，销毁时需要关闭）。如：URL，二进制数据，日期，错误，字符串，通知以及数字等。</li>
+  <li>值永远不会改变，可以让代码天然地具有线程安全特性。结构体声明为变量属性时，改变属性会微整个变量赋值全新的结构体。</li>
+  <li>值语义 (value semantics)，当我们将结构体变量传递给一个函数时，函数将接收到结构体的复制，它也只能改变它自己的这份复制。</li>
+  <li>引用语义 (reference semantics)，对于对象来说，它们是通过传递引用来工作的，因此类对象会拥有很多持有者。</li>
+  <li>结构体赋值时按字节进行浅赋值，编译器针对值类型进行了复制优化。写时复制与复制优化不同，需要由开发者实现。</li>
+</ul>
+
+<h3 id="二可变性">二、可变性</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let mutableArray: NSMutableArray = [1,2,3]
+for _ in mutableArray {
+  mutableArray.removeLastObject()
+}
+// 崩溃，改变数组会破坏迭代器的内部状态
+
+var mutableArray = [1, 2, 3]
+for _ in mutableArray {
+  mutableArray.removeLast()
+}
+// 正常，Swift数组持有独立的复制，改变原数组内容时，不影响数组的迭代器复制。
+
+let mutableArray: NSMutableArray = [1, 2, 3]
+let otherArray = mutableArray
+mutableArray.add(4)
+otherArray // ( 1, 2, 3, 4 )
+// 类是引用类型，改变一个引用内容会影响到另一个，容易产生bug。
+
+
+class BinaryScanner {
+  var position: Int
+  let data: Data
+  init(data: Data) {
+    self.position = 0
+    self.data = data
+  }
+}
+extension BinaryScanner {
+  func scanByte() -&gt; UInt8? {
+    guard position &lt; data.endIndex else {
+      return nil
+    }
+    position += 1
+    return data[position-1]
+  }
+}
+func scanRemainingBytes(scanner: BinaryScanner) {
+  while let byte = scanner.scanByte() {
+    print(byte)
+  }
+}
+let scanner = BinaryScanner(data: Data("hi".utf8))
+scanRemainingBytes(scanner: scanner)
+/*
+104
+105
+*/
+for _ in 0..&lt;Int.max {
+  let newScanner = BinaryScanner(data: Data("hi".utf8))
+  DispatchQueue.global().async {
+    scanRemainingBytes(scanner: newScanner)
+  }
+  scanRemainingBytes(scanner: newScanner)
+}
+// GCD 切换到另一个线程然后扫描了最后的字节，当再切换回第一个线程时，position 将是被增加后的，下标访问也将越界。
+</code></pre></div></div>
+
+<h3 id="三结构体">三、结构体</h3>
+<p>值类型意味着一个值变量被赋值给另一个变量时，这个值本身也会被复制，而不只限于对这个值的引用的复制。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 标量类型都是值类型
+var a = 42
+var b = a
+b += 1
+b // 43
+a // 42
+
+struct Point {
+    var x: Int
+    var y: Int
+}
+// 结构体也同样的工作
+let origin = Point(x: 0, y: 0)
+origin.x = 10 // 错误
+var otherPoint = Point(x: 0, y: 0)
+otherPoint.x += 10
+otherPoint // (x: 10, y: 0)
+var thirdPoint = origin
+thirdPoint.x += 10
+thirdPoint // (x: 10, y: 0)
+origin // (x: 0, y: 0)
+// 赋值时会自动复制
+
+extension Point {
+  static let zero = Point(x: 0, y: 0)
+}
+let rect = Rectangle(origin: Point.zero, size: Size(width: 320, height: 480))
+
+// 自定义一初始方法后，Swift不在生成基于成员的初始化方法，可以在扩展中自定义保留。
+extension Rectangle {
+  init(x: Int = 0, y: Int = 0, width: Int, height: Int) {
+      origin = Point(x: x, y: y)
+      size = Size(width: width, height: height)
+  }
+}
+
+struct Size {
+    var width: Int
+    var height: Int
+}
+struct Rectangle {
+    var origin: Point
+    var size: Size
+}
+
+
+extension Rectangle {
+    mutating func translate(by offset: Point) {
+        origin = origin + offset
+    }
+}
+
+
+extension Rectangle {
+    func translated(by offset: Point) -&gt; Rectangle {
+        var copy = self
+        copy.translate(by: offset)
+        return copy
+    }
+}
+
+extension Rectangle {
+    init(x: Int = 0, y: Int = 0, width: Int, height: Int) {
+        origin = Point(x: x, y: y)
+        size = Size(width: width, height: height)
+    }
+}
+
+func translatedByTenTen(rectangle: Rectangle) -&gt; Rectangle {
+    return rectangle.translated(by: Point(x: 10, y: 10))
+}
+
+var screen = Rectangle(width: 320, height: 480) {
+    didSet {
+        print("Screen changed: \(screen)")
+    }
+}
+
+screen = translatedByTenTen(rectangle: screen)
+screen // (10, 10, 320, 480)
+
+screen.translated(by: Point(x: 10, y: 10))
+</code></pre></div></div>
+<h4 id="1-可变语义">1. 可变语义</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var screen = Rectangle(width: 320, height: 480) {
+  didSet {
+    print("Screen changed: \(screen)")
+  }
+}
+// 改变属性时， disSethi触发
+screen.origin.x = 10 // Screen changed: (10, 0, 320, 480)
+// 与重新赋值相同
+
+var screens: [Rectangle] = [] {
+  didSet {
+  print("Screens array changed: \(screens)")
+  }
+}
+screens.append(Rectangle(width: 320, height: 480))
+// Screens array changed: [(0, 0, 320, 480)]
+screens[0].origin.x += 100 // Screens array changed: [(100, 0, 320, 480)]
+// 如果Rectangle是类，didSet就不会被触发，数组存储的引用不会发生改变，只是引用指向的对象发生了改变。
+
+</code></pre></div></div>
+
+<h4 id="2-可变方法">2. 可变方法</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func +(lhs: Point, rhs: Point) -&gt; Point {
+    return Point(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
+}
+screen.origin + Point(x: 10, y: 10) // (x: 10, y: 10)
+
+extension Rectangle {
+  func translate(by offset: Point) {
+    // 错误：不能赋值属性: 'self' 是不可变的
+    origin = origin + offset
+  }
+}
+extension Rectangle {
+  mutating func translate(by offset: Point) {
+  origin = origin + offset
+  }
+}
+screen.translate(by: Point(x: 10, y: 10))
+screen // (10, 10, 320, 480)
+// 编译器会强制我们添加 mutating 关键字，对 self 的各部分进行改变。
+
+let otherScreen = screen
+// 错误：不能对不可变的量使用可变成员
+otherScreen.translate(by: Point(x: 10, y: 10))
+
+// 属性的 setter 自身就是 mutating 的，无法调用一个 let 变量的 setter
+let point = Point.zero
+// 错误：无法赋值属性：'point' 是一个 'let' 常量
+point.x = 10
+
+// 创建一个复制
+extension Rectangle {
+  func translated(by offset: Point) -&gt; Rectangle {
+    var copy = self
+    copy.translate(by: offset)
+    return copy
+  }
+}
+screen.translated(by: Point(x: 20, y: 20)) // (30, 30, 320, 480)
+// 所有结构体变量都是唯一的，不容易引入bug，除非在不同线程引入同一个全局或被捕获的结构体变量。
+</code></pre></div></div>
+<h4 id="3-mutating是如何工作的inout参数">3. mutating是如何工作的：inout参数</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func translatedByTenTen(rectangle: Rectangle) -&gt; Rectangle {
+  return rectangle.translated(by: Point(x: 10, y: 10))
+}
+screen = translatedByTenTen(rectangle: screen)
+screen // (10, 10, 320, 480)
+
+// inout 本地改变后将新值复制回去，和mutating相同，隐式标记为 inout
+func translateByTwentyTwenty(rectangle: inout Rectangle) {
+  rectangle.translate(by: Point(x: 20, y: 20))
+}
+translateByTwentyTwenty(rectangle: &amp;screen)
+screen // (30, 30, 320, 480)
+
+let immutableScreen = screen
+// 错误：不能将不可变值作为可变参数传入
+translateByTwentyTwenty(rectangle: &amp;immutableScreen)
+
+var array = [Point(x: 0, y: 0), Point(x: 10, y: 10)]
+array[0] += Point(x: 100, y: 100)
+array // [(x: 100, y: 100), (x: 10, y: 10)]
+// array[0] 被自动地作为 inout 变量传入
+
+// 如果将 inout 去掉，编译器不允许对 lhs 赋值
+swift func +=(lhs: inout Point, rhs: Point) { lhs = lhs + rhs }
+var myPoint = Point.zero myPoint += Point(x: 10, y: 10) myPoint // (x: 10, y: 10)
+</code></pre></div></div>
+<h4 id="4-使用值类型避免并行bug">4. 使用值类型避免并行bug</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for _ in 0..&lt;Int.max {
+  let newScanner = BinaryScanner(data: Data("hi".utf8))
+  DispatchQueue.global().async {
+    scanRemainingBytes(scanner: newScanner)
+  }
+  scanRemainingBytes(scanner: newScanner)
+}
+// 两个线程的 newScanner 为独立的复制，position没有共享，可以保持安全迭代
+
+// 在不同线程的循环中，内联使用同一个newScanner变量，会面临静态条件的问题
+for _ in 0..&lt;Int.max {
+  let newScanner = BinaryScanner(data: Data("hi".utf8))
+  DispatchQueue.global().async {
+    while let byte = newScanner.scanByte() {
+      print(byte)
+    }
+  }
+  while let byte = newScanner.scanByte() {
+    print(byte)
+  }
+}
+</code></pre></div></div>
+<h3 id="四写时复制">四、写时复制</h3>
+<p>在 Swift 标准库中，像是 Array，Dictionary 和 Set 这样的集合类型是通过一种叫做写时复制 (copy-on-write) 的技术实现的。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var x = [1,2,3]
+var y = x
+
+// 改变变量时发生复制
+x.append(5)
+y.removeLast()
+x // [1, 2, 3, 5]
+y // [1, 2]
+// 变量发生改变时，先检查在存储缓冲区的引用是否唯一。如果不是唯一，先进行复制，对复制的值进行变化。
+</code></pre></div></div>
+<h4 id="1-实现写时复制">1. 实现写时复制</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 NSMutableData 实现 Data 结构体，Data 与 Array 一样，是值类型。
+var input: [UInt8] = [0x0b,0xad,0xf0,0x0d]
+var other: [UInt8] = [0x0d]
+var d = Data(bytes: input)
+var e = d
+d.append(contentsOf: other)
+d // 5 bytes
+e // 4 bytes
+// d 和 e 是独立的，向 d 中添加一个字节并不会改变 e 的值
+
+var f = NSMutableData(bytes: &amp;input, length: input.count)
+var g = f
+f.append(&amp;other, length: other.count)
+f // &lt;0badf00d 0d&gt;
+g // &lt;0badf00d 0d&gt;
+
+f === g // true
+
+struct MyData {
+  var _data: NSMutableData
+  init(_ data: NSData) {
+    _data = data.mutableCopy() as! NSMutableData
+  }
+}
+// 使用时浅复制，只复制了引用
+let theData = NSData(base64Encoded: "wAEP/w==")!
+let x = MyData(theData)
+let y = x
+x._data === y._data // true
+
+// 不包含值语义的结构体
+extension MyData {
+  func append(_ byte: UInt8) {
+  var mutableByte = byte
+    _data.append(&amp;mutableByte, length: 1)
+  }
+}
+x.append(0x55)
+y // &lt;c0010fff 55&gt;
+</code></pre></div></div>
+<h4 id="2-写时复制昂贵方式">2. 写时复制（昂贵方式）</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过 _dataForWriting 计算属性，复制 _data 并返回。
+struct MyData {
+  fileprivate var _data: NSMutableData
+  fileprivate var _dataForWriting: NSMutableData {
+    mutating get {
+      _data = _data.mutableCopy() as! NSMutableData
+      return _data
+    }
+  }
+  init() {
+    _data = NSMutableData()
+  }
+  init(_ data: NSData) {
+    _data = data.mutableCopy() as! NSMutableData
+  }
+}
+
+extension MyData {
+  mutating func append(_ byte: UInt8) {
+    var mutableByte = byte
+    _dataForWriting.append(&amp;mutableByte, length: 1)
+  }
+}
+// 结构体具有值语义了
+let theData = NSData(base64Encoded: "wAEP/w==")!
+var x = MyData(theData)
+let y = x
+x._data === y._data // true
+x.append(0x55)
+y // &lt;c0010fff&gt;
+x._data === y._data // false
+
+// 多次改变同一个变量时，每次都要复制，浪费资源
+var buffer = MyData(NSData())
+for byte in 0..&lt;5 as CountableRange&lt;UInt8&gt; {
+  buffer.append(byte)
+}
+</code></pre></div></div>
+<h4 id="3-写时复制高效方式">3. 写时复制（高效方式）</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 isKnownUniquelyReferenced 函数来检查某个引用只有一个持有者
+// isKnownUniquelyReferenced 对于 Objective-C 类，会直接返回 false ，需封装到Swift对象中
+final class Box&lt;A&gt; {
+  var unbox: A
+  init(_ value: A) { self.unbox = value }
+}
+var x = Box(NSMutableData())
+isKnownUniquelyReferenced(&amp;x) // true
+
+var y = x
+isKnownUniquelyReferenced(&amp;x) // false
+
+// 重构写时复制，发生改变前先判断 _data 的引用是否唯一。
+struct MyData {
+  private var _data: Box&lt;NSMutableData&gt;
+  var _dataForWriting: NSMutableData {
+    mutating get {
+      if !isKnownUniquelyReferenced(&amp;_data) {
+        _data = Box(_data.unbox.mutableCopy() as! NSMutableData)
+        print("Making a copy")
+      }
+      return _data.unbox
+    }
+  }
+  init() {
+    _data = Box(NSMutableData())
+  }
+  init(_ data: NSData) {
+    _data = Box(data.mutableCopy() as! NSMutableData)
+  }
+}
+
+extension MyData {
+  mutating func append(_ byte: UInt8) {
+    var mutableByte = byte
+    _dataForWriting.append(&amp;mutableByte, length: 1)
+  }
+}
+
+var bytes = MyData()
+var copy = bytes
+for byte in 0..&lt;5 as CountableRange&lt;UInt8&gt; {
+  print("Appending 0x\(String(byte, radix: 16))")
+  bytes.append(byte)
+}
+/*
+Appending 0x0
+Making a copy
+Appending 0x1
+Appending 0x2
+Appending 0x3
+Appending 0x4
+*/
+bytes // &lt;00010203 04&gt;
+copy // &lt;&gt;
+// 调试语句被打印一次，已用唯一，没有额外的复制操作
+</code></pre></div></div>
+<ul>
+  <li>这项技术让你能够在创建保留值语义的结构体的同时，保持像对象和指针那样的高效操作</li>
+  <li>结构体应该具有值语义，当定义自己的结构体和类的时候，需要特别注意那些原本就可以复制和可变的行为。</li>
+  <li>Swift 标准库中的大部分数据结构是使用了写时复制的值类型。比如数组，字典，集合，字符串。 对比 Foudation 框架 中的 NSArray 和 NSString 之类的类型，容易写出不安全的代码。</li>
+  <li>类仍然很有用，如单例和暴露接口给 Objective-C。</li>
+  <li>枚举也是值类型，可以将已存在的类型封装到枚举中。
+    <h4 id="4-写时复制的陷阱">4. 写时复制的陷阱</h4>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>final class Empty { }
+struct COWStruct {
+  var ref = Empty()
+  mutating func change() -&gt; String {
+    if isKnownUniquelyReferenced(&amp;ref) {
+      return "No copy"
+    } else {
+      return "Copy"
+    }
+    // 进行实际改变
+  }
+}
+
+var s = COWStruct()
+s.change() // No copy
+
+var original = COWStruct()
+var copy = original
+original.change() // Copy
+
+var array = [COWStruct()]
+array[0].change() // No copy
+
+// 使用中间变量时，会进行复制
+var otherArray = [COWStruct()]
+var x = array[0]
+x.change() // Copy
+
+// 字典的下标会在字典中寻找值，然后返回，是值的复制
+var dict = ["key": COWStruct()]
+dict["key"]?.change() // Optional("Copy")
+
+// 对写时复制优化：自定义存储值的容器，直接访问存储属性，或使用下标。
+struct ContainerStruct&lt;A&gt; {
+  var storage: A
+  subscript(s: String) -&gt; A {
+    get { return storage }
+    set { storage = newValue }
+  }
+}
+var d = ContainerStruct(storage: COWStruct())
+d.storage.change() // No copy
+d["test"].change() // Copy
+// Array 的下标使用了特别处理，通过地址器的方式实现下标，可以直接对内存访问。
+</code></pre></div></div>
+<h4 id="五闭包和可变性">五、闭包和可变性</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将状态移到函数外部实现，每次调用时生成一个唯一的证书，直到Int.max。
+var i = 0
+func uniqueInteger() -&gt; Int {
+  i += 1
+  return i
+}
+
+// 调用时共享变量 i ，复制给另一个变量时则不会共享
+let otherFunction: () -&gt; Int = uniqueInteger
+
+// 函数是引用类型，传递将共享状态
+func uniqueIntegerProvider() -&gt; () -&gt; Int {
+  var i = 0
+  return {
+  i += 1
+  return i
+  }
+}
+
+func uniqueIntegerProvider() -&gt; AnyIterator&lt;Int&gt; {
+  var i = 0
+  return AnyIterator {
+    i += 1
+    return i
+  }
+}
+</code></pre></div></div>
+<p>Swift 的结构体一般被存储在栈上，而非堆上。不过对于可变结构体，这其实是一种优化：默认情况下结构体是存储在堆上的，但是在绝大多数时候，这个优化会生效，并将结构体存储到栈上。编译器这么做是因为那些被逃逸闭包捕获的变量需要在栈帧之外依然存在。当编译器侦测到结构体变量被一个函数闭合的时候，优化将不再生效，此时这个结构体将存储在堆上。这样一来，在我们的例子里，就算 uniqueIntegerProvider 退出了作用域，i 也将继续存在。</p>
+<h3 id="六内存">六、内存</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 结构体/枚举，内存管理很容易，它们只会有一个持有者，所需要的内存可以被自动地创建和释放。
+struct Person {
+  let name: String
+  var parents: [Person]
+}
+var john = Person(name: "John", parents: [])
+john.parents = [john]
+john // John, parents: [John, parents: []]
+
+// 对于类，Swift 使用自动引用计数 (ARC) 来进行内存管理
+// 强引用变量：每次你创建一个对象的新的引用 (比如为类变量赋值)，引用计数会被加一。一旦引用失效 (比如变量离开了作用域)，引用计数将被减一。如果引用计数为零，对象将被销毁。
+class View {
+  var window: Window
+  init(window: Window) {
+    self.window = window
+  }
+}
+class Window {
+  var rootView: View?
+}
+
+// 正常
+var myWindow: Window? = Window() // refcount: 1
+myWindow = nil // refcount: 0, deallocating
+
+// 引用循环，两个对象在程序的生命周期中永远无法被释放
+var window: Window? = Window() // window: 1
+var view: View? = View(window: window!) // window: 2, view: 1
+window?.rootView = view // window: 2, view: 2
+view = nil // window: 2, view: 1
+window = nil // window: 1, view: 1
+</code></pre></div></div>
+<h4 id="1-weak引用">1. weak引用</h4>
+<p>Swift 中的弱引用是趋零的：当一个弱引用变量所引用的对象被释放时，这个变量将被自动设为 nil。被声明为可选值的原因。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
+  var window: Window
+  init(window: Window) {
+    self.window = window
+  }
+  deinit {
+    print("Deinit View")
+  }
+}
+class Window {
+  weak var rootView: View?
+  deinit {
+    print("Deinit Window")
+  }
+}
+
+var window: Window? = Window()
+var view: View? = View(window: window!)
+window?.rootView = view
+window = nil
+view = nil
+/*
+Deinit View
+Deinit Window
+*/
+</code></pre></div></div>
+<p>使用 delegate 时一般标记为weak，否则会出现循环引用</p>
+<h4 id="2-unowned引用">2. unowned引用</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
+  unowned var window: Window
+  init(window: Window) {
+    self.window = window
+  }
+  deinit {
+    print("Deinit View")
+  }
+}
+class Window {
+  var rootView: View?
+  deinit {
+    print("Deinit Window")
+  }
+}
+
+var window: Window? = Window()
+var view: View? = View(window: window!)
+window?.rootView = view
+view = nil
+window = nil
+/*
+Deinit Window
+Deinit View
+*/
+</code></pre></div></div>
+<ul>
+  <li>对每个 unowned 的引用，Swift 运行时将为这个对象维护另外一个引用计数。当所有的 strong 引用消失时，对象将把它的资源 (比如对其他对象的引用) 释放掉。不过，这个对象本身的内存将继续存在，直到所有的 unowned 引用也都消失。这部分内存将被标记为无效 (有时候我们也把它叫做僵尸 (zombie) 内存)，当我们试图访问这样的 unowned 引用时，就会发生运行时错误。</li>
+  <li>不过注意这其实并不是未定义的行为。我们还有第三种选择，那就是 unowned(unsafe)，它不会做运行时的检查。当我们访问一个已经无效的 unowned(unsafe) 引用时，这时候结果将是未定义的。
+    <h4 id="3-在-unowned-和-weak-之间进行选择">3. 在 unowned 和 weak 之间进行选择</h4>
+  </li>
+  <li>如果这些对象的生命周期互不相关，不能保证哪一个对象存在的时间会比另一个长，那么弱引用就是唯一的选择。</li>
+  <li>可以保证非强引用对象拥有和强引用对象同样或者更长的生命周期的话，unowned 引用通常会更方便一些
+，不需要处理可选值。</li>
+  <li>unowned 引用要比 weak 引用少一些性能损耗，因此访问一个 unowned 引用的属性或者调用它上面的方法都会稍微快一些；不过，这个因素应该只在性能非常重要的代码路径上才需要被考虑。</li>
+  <li>unowned 在生命周期的假设不成立时导致程序崩溃，尽量使用 weak，不能保证重构时假设是否生效。
+    <h3 id="七闭包和内存">七、闭包和内存</h3>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 闭包对其中的变量持有强引用，回调结束后释放
+let handle = FileHandle(forWritingAtPath: "out.html")
+let request = URLRequest(url: URL(string: "https://www.objc.io")!)
+URLSession.shared.dataTask(with: request) { (data, _, _) in
+  guard let theData = data else { return }
+  // 闭包将对 handle 进行强引用
+  handle?.write(theData)
+}.resume()
+</code></pre></div></div>
+<h4 id="1-引用循环">1. 引用循环</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
+  var window: Window
+  init(window: Window) {
+    self.window = window
+  }
+  deinit {
+    print("Deinit View")
+  }
+}
+class Window {
+  weak var rootView: View?
+  var onRotate: (() -&gt; ())?
+  deinit {
+    print("Deinit Window")
+  }
+}
+
+var window: Window? = Window()
+var view: View? = View(window: window!)
+window?.rootView = view
+
+window?.onRotate = {
+  print("We now also need to update the view: \(view)")
+}
+// 产生循环：视图引用了窗口，窗口引用回调，回调引用视图
+</code></pre></div></div>
+<p><img src="http://files.pandaleo.cn/dd400302da9380a427b25c040e741884.png?imageMogr2/thumbnail/!50p" alt="" />
+三种打破方式</p>
+<ul>
+  <li>Window 的引用变为 weak，会导致Window消失，不可行。</li>
+  <li>Window 的 onRotate 闭包声明为 weak，不过 Swift 不允许将闭包标记为 weak，不可行。</li>
+  <li>唯一方式：通过使用捕获列表 (capture list) 来让闭包不去引用视图。</li>
+</ul>
+
+<h4 id="2-捕获列表">2. 捕获列表</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 捕获列表将变量 view 标记为 weak 或 unowned，打破循环
+window?.onRotate = { [weak view] in
+  print("We now also need to update the view: \(view)")
+}
+
+// 捕获列表也可以初始化新的变量
+window?.onRotate = { [weak view, weak myWindow=window, x=5*5] in
+  print("We now also need to update the view: \(view)")
+  print("Because the window \(myWindow) changed")
+}
+
+</code></pre></div></div>
+:ET

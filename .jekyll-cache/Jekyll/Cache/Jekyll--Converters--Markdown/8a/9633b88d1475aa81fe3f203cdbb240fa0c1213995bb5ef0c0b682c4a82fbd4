@@ -1,0 +1,191 @@
+I"�<h3 id="1-字符串反转">1. 字符串反转</h3>
+<ul>
+  <li>给定字符串“hello, world”，实现将其反转</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> void char_reverse(char* cha)
+{
+    char* begin = cha;
+    cahr* end = cha + strlen(char) - 1;
+
+    while (begin &lt; end) {
+        char temp = *begin;
+        *(begin++) = *end;
+        *(end—) = temp;
+    }
+
+}
+</code></pre></div></div>
+
+<h3 id="2-链表反转">2. 链表反转</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>while (p != NULL) {
+    struct Node *temp = p-&gt;next;
+    p-&gt;next = newH;
+    newH = p;
+    p = temp;
+}
+</code></pre></div></div>
+<h3 id="3-有序数组合并">3. 有序数组合并</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>while (p &lt; aLen &amp;&amp; q &lt; bLen) {
+    if (a[p] &lt; b[q]) {
+        result[i] = a[p];
+        p++;
+    }
+    else {
+        result[i] = b[q];
+        q++;
+    }
+    i++;
+}
+</code></pre></div></div>
+<h3 id="4-hash算法">4. Hash算法</h3>
+<ul>
+  <li>在一个字符串中找到第一个只出现一次的字符。</li>
+  <li>如：输入“abaccdeff”，则输出b。</li>
+  <li>算法思路
+    <ul>
+      <li>字符(char)是一个长度为8的数据类型，因此总共有可能256中可能。</li>
+      <li>每个字母根据其ASCII码值作为数组的下标对应数组的一个数字。</li>
+      <li>数组中存储的每个字符出现的次数。</li>
+    </ul>
+  </li>
+  <li>哈希表
+    <ul>
+      <li>例：给定值是字母a，对应ASCII值为97，数组索引下标为97。
+<img src="http://files.pandaleo.cn/11e542de3b6056527c2aca40934d8666.png?imageMogr2/thumbnail/!50p" alt="" /></li>
+      <li>存储和查找都通过该函数，有效提高查找效率。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>char* p = cha;
+while (*p != ‘\0’) {
+    array[*(p++)]++;
+}
+
+p = cha;
+
+while (*p != ‘\0’) {
+    if (array[*p] == 1)
+    {
+        result = *p;
+        break;
+    }
+    p++;
+}
+
+return result;
+</code></pre></div></div>
+<h3 id="5-查找两个子视图的共同父视图">5. 查找两个子视图的共同父视图</h3>
+<p><img src="http://files.pandaleo.cn/9d60a4daa9ece901f5da6cde50ffe174.png?imageMogr2/thumbnail/!50p" alt="" /></p>
+<ul>
+  <li>算法思路
+    <ul>
+      <li>记录视图A所有的父视图，放入数组</li>
+      <li>记录视图B所有的父视图，放入数组</li>
+      <li>倒序比较找到第一个不一样的父视图，该视图为两个子视图的共同父视图</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 返回所有父视图
+while (temp) {
+    [result addObject:temp];
+    temp = temp.superview;
+}
+
+
+// 倒序方式获取各个视图父视图
+while (i &lt; MIN((int)arrayOne.count, (int)arrayOther.count)) {
+
+    UIView *superOne = arrayOne[arrayOne.count - i - 1];
+    UIView *superOther = arrayOne[arrayOther.count - i - 1];
+
+    if (superOne == superOther) {
+        [result addObject:superOne];
+    }
+    else {
+        break;
+    }
+
+}
+</code></pre></div></div>
+<h3 id="6-求无序数组当中的中位数">6. 求无序数组当中的中位数</h3>
+<ul>
+  <li>排序算法 + 中位数
+    <ul>
+      <li>冒泡排序、快速排序、堆排序……</li>
+      <li>中位数
+        <ul>
+          <li>当n为奇数时，(n+1)/2;</li>
+          <li>当n为偶数时，(n/2 + (n/2 + 1))/2;</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>利用快排思想（分治思想）
+    <ul>
+      <li>
+        <p>选取关键字，高低交替扫描</p>
+
+        <ul>
+          <li>任意挑一个元素，以该元素为支点，划分集合为两部分。</li>
+          <li>如果左侧集合长度恰为（n-1）/ 2，那么支点恰为中位数。</li>
+          <li>如果左侧长度&lt;（n-1）/ 2，那么中位数在右侧；反之，中位数在左侧。</li>
+          <li>进入相应的一侧继续寻找中位点。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int PartSort()
+{
+
+    low = start;
+    high = end;
+
+    key = a[end];
+
+    while(low &lt; high)
+    {
+        while(low &lt; high &amp;&amp; a[low] &lt;= key)
+        {
+            ++low;
+        }
+
+        while(low &lt; high &amp;&amp; a[low] &gt;= key)
+        {
+            —-high;
+        }
+
+        if (low &lt; high)
+        {
+            a[low] &lt;—&gt; a[high];
+        }
+    }
+
+    a[high] &lt;-&gt; a[end];
+
+    retrun low;
+}
+
+int findMedian
+{
+    low = 0;
+    high = aLen - 1;
+    mid = (aLen - 1) /2
+
+    while(div != mid) {
+        if mid &lt; div {
+            div = PartSort(a, low, div - 1);
+        }
+        else
+        {
+            div = PartSort(a, div+1, high);
+        }
+    }
+    return a[mid];
+}
+</code></pre></div></div>
+:ET

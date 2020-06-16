@@ -1,0 +1,38 @@
+I"�<h4 id="1-method-swizzling替换方法">1. Method-Swizzling替换方法</h4>
+<p><img src="http://files.pandaleo.cn/a9f86d402d7fb07f303f40795465c81e.png" alt="" /></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (void)load {
+    Method test = class_getInstanceMethod(self, @selector(test));
+    Method otherTest = class_getInstanceMethod(self, @selector(otherTest));
+    method_exchangeImplementations(test, otherTest);
+}
+
+- (void)test {
+    NSLog(@"test");
+}
+
+- (void)otherTest {
+    [self otherTest];
+    NSLog(@"otherTest");
+}
+// 先打印test，然后打印otherTest，两个方法替换了。
+// 实际开发中可以替换view生命周期方法，添加日志能操作
+</code></pre></div></div>
+
+<h4 id="2-动态添加方法">2. 动态添加方法</h4>
+<ul>
+  <li>performSelector:</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void testImp (void) { }
++ (BOOL)resolveInstanceMethod:(SEL)sel {
+    class_addMethod(self, @selector(test), testImp, “v@:”);
+}
+</code></pre></div></div>
+
+<h4 id="3-动态方法解析">3. 动态方法解析</h4>
+<p>@dynamic</p>
+<ul>
+  <li>动态运行时语言将函数决议推迟到运行时。当属性标记为dynamic时，不需要编译器在编译时生成属性的getter和setter，在运行调用时再添加具体实现。</li>
+  <li>编译时语言在编译器进行函数决议。</li>
+</ul>
+:ET

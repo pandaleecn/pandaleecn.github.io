@@ -1,0 +1,5 @@
+I"�<h3 id="一什么是-websocket-">一、什么是 websocket ？</h3>
+<p>WebSocket protocol 是HTML5一种新的协议。它实现了浏览器与服务器全双工通信(full-duplex)。
+在 WebSocket API，浏览器和服务器只需要要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。
+<img src="http://files.pmpanda.com/890ac151bb9865f78ebe5940e0027f42.png" alt="socket连接过程" /></p>
+:ET

@@ -1,0 +1,784 @@
+I"�`<h3 id="一哨岗值">一、哨岗值</h3>
+<p>在编程世界中有一种非常通用的模式，那就是某个操作是否要返回一个有效值。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// C。EOF 只是对于 -1 的一个 #define
+int ch;
+while ((ch = getchar()) != EOF) {
+  printf("Read character %c\n", ch);
+}
+printf("Reached end-of-file\n");
+
+// C++。vec.end() 是容器的“末尾再超一位”的迭代器。
+auto vec = {1, 2, 3};
+auto iterator = std::find(vec.begin(), vec.end(), someValue);
+if (iterator != vec.end()) {
+  std::cout &lt;&lt; "vec contains " &lt;&lt; *iterator &lt;&lt; std::endl;
+}
+
+// Java 代码就将抛出一个 NullPointerException
+int i = Integer.getInteger("123")
+
+// OC。NSString 有可能是 nil
+[[NSString alloc] initWithContentsOfURL:url
+encoding:NSUTF8StringEncoding error:&amp;e];
+
+// Objective-C 在运行时会保证向 nil 发送消息时，返回值总是等价于 0
+// 如果 someString 是 nil，返回为零的 NSRange，而 NSNotFound 被定义为 NSIntegerMax，if 语句的内容将被执行。
+NSString *someString = ...;
+if ([someString rangeOfString:@"Swift"].location != NSNotFound) {
+  NSLog(@"Someone mentioned Swift!");
+}
+</code></pre></div></div>
+<ul>
+  <li>这些函数都返回了一个“魔法”数来表示函数并没有返回真实的值。这样的值被称为“哨岗值”。</li>
+  <li>哨岗值很容易产生问题，因为你可能会忘记检查哨岗值，并且会不小心使用它们。</li>
+</ul>
+
+<h3 id="二通过枚举解决魔法数的问题">二、通过枚举解决魔法数的问题</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Optional&lt;Wrapped&gt; {
+  case none
+  case some(Wrapped)
+}
+</code></pre></div></div>
+<ul>
+  <li>枚举含有“关联值”的概念，可以在他们的值中包含另外的关联的值。</li>
+  <li>标签联合，将若干不同的可能类型保存在内存的同一空间中，并使用一个标签来区分到底被持有的是什么类型。在Swift枚举中，枚举的case就是标签。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Swift 中与 find 等效的方法 index(of:) 所返回的不是一个索引值，而是一个 Optional&lt;Index&gt;。
+extension Collection where Element: Equatable {
+  func index(of element: Element) -&gt; Optional&lt;Index&gt; {
+    var idx = startIndex
+    while idx != endIndex {
+      if self[idx] == element {
+        return .some(idx)
+      }
+      formIndex(after: &amp;idx)
+    }
+    // 没有找到，返回 .none
+    return .none
+  }
+}
+
+var array = ["one", "two", "three"]
+let idx = array.index(of: "four")
+// 编译错误：remove(at:) 接受 Int，而不是 Optional&lt;Int&gt;
+array.remove(at: idx)
+
+var array = ["one","two","three"]
+switch array.index(of: "four") {
+  case .some(let idx):
+    array.remove(at: idx)
+  case .none:
+    break // 什么都不做
+}
+
+switch array.index(of: "four") {
+  case let idx?:
+    array.remove(at: idx)
+  case nil:
+    break // 什么都不做
+}
+</code></pre></div></div>
+
+<h3 id="三可选值概览">三、可选值概览</h3>
+<h4 id="1-if-let">1. if let</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var array = ["one", "two", "three", "four"]
+if let idx = array.index(of: "four") {
+  array.remove(at: idx)
+}
+
+// 可选绑定和一个布尔限定语句搭配
+if let idx = array.index(of: "four"), idx != array.startIndex {
+  array.remove(at: idx)
+}
+
+// 同一个 if 语句中绑定多个值，后面的绑定值可以基于之前的成功解包的值来进行操作
+let urlString = "https://www.objc.io/logo.png"
+if let url = URL(string: urlString),
+let data = try? Data(contentsOf: url),
+let image = UIImage(data: data)
+{
+  let view = UIImageView(image: image)
+  PlaygroundPage.current.liveView = view
+}
+
+// 多个 let 的任意部分也能拥有布尔值限定的语句
+if let url = URL(string: urlString), url.pathExtension == "png",
+let data = try? Data(contentsOf: url),
+let image = UIImage(data: data)
+{
+  let view = UIImageView(image: image)
+}
+
+// 为 if 提供一个前置的条件
+if segue.identifier == "showUserDetailsSegue",
+let userDetailVC = segue.destination
+as? UserDetailViewController
+{
+  userDetailVC.screenName = "Hello"
+}
+
+// 与Foundation 框架的 Scanner 类型搭配使用
+let scanner = Scanner(string: "lisa123")
+var username: NSString?
+let alphas = CharacterSet.alphanumerics
+if scanner.scanCharacters(from: alphas, into: &amp;username),
+let name = username {
+  print(name)
+}
+
+</code></pre></div></div>
+<h4 id="2-while-let">2. while let</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Unix 中 cat 命令等价的函数
+while let line = readLine() {
+  print(line)
+}
+
+// 遇到 EOF 或者空行的时候终止循环
+while let line = readLine(), !line.isEmpty {
+  print(line)
+}
+
+// 用于 makeIterator 方法来创建的迭代器
+let array = [1, 2, 3]
+var iterator = array.makeIterator()
+while let i = iterator.next() {
+  print(i, terminator: " ")
+} // 1 2 3
+
+for i in 0..&lt;10 where i % 2 == 0 {
+  print(i, terminator: " ")
+} // 0 2 4 6 8
+
+var iterator2 = (0..&lt;10).makeIterator()
+  while let i = iterator.next() {
+  if i % 2 == 0 {
+    print(i)
+  }
+}
+
+// Ruby错误用法
+// 打印三个3，闭包补获了同一个i变量
+functions = []
+for i in 1..3
+  functions.push(lambda { i })
+end
+for f in functions
+  print "#{f.call()} "
+end
+
+// Ruby执行分析，i在循环外部，被重用
+// do让这个变量在整个循环外部不被访问到，夹在内部和外部之间
+var functions2: [() -&gt; Int] = []
+do {
+  var iterator2 = (1...3).makeIterator()
+  var i: Int
+  var current: Int? = iterator2.next()
+  while current != nil {
+    i = current!
+    functions2.append { i }
+    current = iterator2.next()
+  }
+}
+
+// Swift在作用域内重新赋值
+var functions: [() -&gt; Int] = []
+for i in 1...3 {
+  functions.append { i }
+}
+for f in functions {
+  print("\(f())", terminator: " ")
+} // 1 2 3
+
+// Swift执行分析
+var functions1: [() -&gt; Int] = []
+var iterator1 = (1...3).makeIterator()
+var current1: Int? = iterator1.next()
+while current1 != nil {
+  let i = current1!
+  functions1.append { i }
+  nctions1.append { i }
+  current1 = iterator1.next()
+}
+</code></pre></div></div>
+<h4 id="3-双重可选值">3. 双重可选值</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可选值嵌套在可选值中
+let stringNumbers = ["1", "2", "three"]
+let maybeInts = stringNumbers.map { Int($0) } // [Optional(1), Optional(2), nil]
+
+for maybeInt in maybeInts {
+  // maybeInt 是一个 Int? 值
+  // 得到两个整数值和一个 `nil`
+}
+
+// iterator.next() 返回 Optional&lt;Optional&lt;Int&gt;&gt; 值
+var iterator = maybeInts.makeIterator()
+while let maybeInt = iterator.next() {
+  print(maybeInt, terminator: " ")
+}
+// Optional(1) Optional(2) nil
+
+// 使用case匹配模式，对非nil的值做for循环
+for case let i? in maybeInts {
+// i 将是 Int 值，而不是 Int?
+  print(i, terminator: " ")
+}
+// 1 2
+// 或者只对 nil 值进行循环
+for case nil in maybeInts {
+  // 将对每个 nil 执行一次
+  print("No value")
+}
+// No value
+
+for case let .some(i) in maybeInts {
+  print(i)
+}
+
+// 将switch的匹配模式用在循环和判断中
+let j = 5
+if case 0..&lt;10 = j {
+  print("\(j) 在范围内")
+} // 5 在范围内
+
+// case 匹配通过重载 ~= 运算符扩展
+struct Pattern {
+  let s: String
+  init(_ s: String) { self.s = s }
+}
+func ~=(pattern: Pattern, value: String) -&gt; Bool {
+  return value.range(of: pattern.s) != nil
+}
+
+let s = "Taylor Swift"
+if case Pattern("Swift") = s {
+  print("\(String(reflecting: s)) contains \"Swift\"")
+}
+// "Taylor Swift" contains "Swift
+
+// 大坑！除非还定义了更精确的版本，否则这段代码将会使所有情形都匹配。
+func ~=&lt;T, U&gt;(_: T, _: U) -&gt; Bool { return true }
+</code></pre></div></div>
+<h4 id="4-if-var-and-while-var">4. if var and while var</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// i是本地的复制，不改变原值
+let number = "1"
+if var i = Int(number) {
+    i += 1
+    print(i)
+} // 2
+</code></pre></div></div>
+<h4 id="5-解包后可选值的作用域">5. 解包后可选值的作用域</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let array = [1,2,3]
+if !array.isEmpty {
+  print(array[0])
+}
+// if 块的外部，编译器无法保证 a[0] 的有效性
+
+if let firstElement = array.first {
+  print(firstElement)
+}
+// if 块的外部，不能使用 firstElement
+
+func doStuff(withArray a: [Int]) {
+  if a.isEmpty {
+    return
+  }
+  // 现在可以安全地使用 a[0]
+}
+
+extension String {
+  var fileExtension: String? {
+    let period: String.Index
+    if let idx = index(of: ".") {
+      period = idx
+    } else {
+      return nil
+    }
+    let extensionStart = index(after: period)
+    return String(self[extensionStart...])
+  }
+}
+"hello.txt".fileExtension // Optional("txt")
+// if语句后，代码可以随意使用period，不需要考虑可选值的可能性。
+
+func doStuff(withArray a: [Int]) {
+  guard let firstElement = a.first else {
+    return
+  }
+  // firstElement is unwrapped here
+}
+
+extension String {
+  var fileExtension: String? {
+    guard let period = index(of: ".") else {
+      return nil
+    }
+    let extensionStart = index(after: period)
+    return String(self[extensionStart...])
+  }
+}
+// guard的else可以做任何事，包括执行多句代码。必须在else中离开当前作用域，return或调用fatalError（或其他返回Never的方法）。循环中也可以使用break或continue。
+
+// guard可以接受if条件，单使用啰嗦，不清晰。
+func doStuff2(withArray a: [Int]) {
+  guard !a.isEmpty else { return }
+  // 现在可以安全地使用 a[0] 或 a.first! 了
+}
+</code></pre></div></div>
+<h4 id="6-可选链">6. 可选链</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可选链，方法可能会不被调用
+delegate?.callback()
+
+let str: String? = "Never say never"
+// 我们希望 upper 是大写的字符串
+let upper: String
+if str != nil {
+  upper = str!.uppercased()
+} else {
+  // 这里没有合理的处理方法
+  fatalError("no idea what to do now...")
+}
+
+let result = str?.uppercased() // Optional("NEVER SAY NEVER")
+let lower = str?.uppercased().lowercased() // Optional("never say never")
+// 可选链”展评操作”。
+
+// 除2，不够2大返回nil
+extension Int {
+  var half: Int? {
+    guard self &lt; -1 || self &gt; 1 else { return nil }
+    return self / 2
+  }
+}
+// 都有可能返回可选结果
+20.half?.half?.half // Optional(2)
+
+let dictOfArrays = ["nine": [0, 1, 2, 3]]
+dictOfArrays["nine"]?[3] // Optional(3)
+
+let dictOfFunctions: [String: (Int, Int) -&gt; Int] = [
+  "add": (+),
+  "subtract": (-)
+]
+dictOfFunctions["add"]?(1, 1) // Optional(2)
+
+class TextField {
+  private(set) var text = ""
+  var didChange: ((String) -&gt; ())?
+  private func textDidChange(newText: String) {
+    text = newText
+    // 如果不是 nil 的话，触发回调
+    didChange?(text)
+  }
+}
+// 注册回调时调用，非常简洁。
+
+struct Person {
+  var name: String
+  var age: Int
+}
+var optionalLisa: Person? = Person(name: "Lisa Simpson", age: 8)
+  // 如果不是 nil，则增加
+  if optionalLisa != nil {
+  optionalLisa!.age += 1
+}
+// 上面丑陋，下面值复制，不改变原数据
+if var lisa = optionalLisa {
+  // 对 lisa 的变更不会改变 optionalLisa 中的属性
+  lisa.age += 1
+}
+// 简洁
+optionalLisa?.age += 1
+
+var a: Int? = 5
+a? = 10 // 赋值发生前不是 nil
+a // Optional(10)
+var b: Int? = nil
+b? = 10
+b // nil
+</code></pre></div></div>
+<h4 id="7-nil-合并运算符">7. nil 合并运算符</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let stringteger = "1"
+let number = Int(stringteger) ?? 0
+// lhs != nil ? lhs! : rhs
+
+let array = [1,2,3]
+!array.isEmpty ? array[0] : 0
+array.first ?? 0 // 1
+
+array.count &gt; 5 ? array[5] : 0 // 0
+
+extension Array {
+  subscript(guarded idx: Int) -&gt; Element? {
+    guard (startIndex..&lt;endIndex).contains(idx) else {
+      return nil
+    }
+    return self[idx]
+  }
+}
+// 简写成
+array[guarded: 5] ?? 0 // 0
+
+let i: Int? = nil
+let j: Int? = nil
+let k: Int? = 42
+i ?? j ?? k ?? 0 // 42
+
+let m = i ?? j ?? k
+type(of: m) // Optional&lt;Int&gt;
+
+if let n = i ?? j {
+  // 和 if i != nil || j != nil 类似
+  print(n)
+}
+
+if let n = i, let m = j { }
+// 和 if i != nil &amp;&amp; j != nil 类似
+
+let s1: String?? = nil // nil
+(s1 ?? "inner") ?? "outer" // inner
+let s2: String?? = .some(nil) // Optional(nil)
+(s2 ?? "inner") ?? "outer" // outer
+</code></pre></div></div>
+<h4 id="8-在字符串插值中使用可选值">8. 在字符串插值中使用可选值</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let bodyTemperature: Double? = 37.0
+let bloodGlucose: Double? = nil
+print(bodyTemperature) // Optional(37.0)
+// 警告：表达式被隐式强制从 'Double?' 转换为 Any
+print("Blood glucose level: \(bloodGlucose)") // Blood glucose level: nil
+// 警告：字符串插值将使用调试时的可选值描述，
+// 请确认这是确实是你想要做的。
+
+infix operator ???: NilCoalescingPrecedence
+public func ???&lt;T&gt;(optional: T?, defaultValue: @autoclosure () -&gt; String)
+-&gt; String
+{
+  switch optional {
+    case let value?: return String(describing: value)
+    case nil: return defaultValue()
+  }
+}
+
+print("Body temperature: \(bodyTemperature ??? "n/a")")
+// Body temperature: 37.0
+print("Blood glucose level: \(bloodGlucose ??? "n/a")")
+// Blood glucose level: n/a
+</code></pre></div></div>
+<h4 id="9-可选值-map">9. 可选值 map</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let characters: [Character] = ["a", "b", "c"]
+String(characters[0]) // a
+
+var firstCharAsString: String? = nil
+if let char = characters.first {
+  firstCharAsString = String(char)
+}
+
+let firstChar = characters.first.map { String($0) } // Optional("a")
+
+extension Optional {
+  func map&lt;U&gt;(transform: (Wrapped) -&gt; U) -&gt; U? {
+    if let value = self {
+      return transform(value)
+    }
+    return nil
+  }
+}
+
+let firstChar = characters.first.map { String($0) } // Optional("a")
+
+extension Optional {
+  func map&lt;U&gt;(transform: (Wrapped) -&gt; U) -&gt; U? {
+    if let value = self {
+      return transform(value)
+    }
+    return nil
+  }
+}
+
+extension Array {
+  func reduce(_ nextPartialResult: (Element, Element) -&gt; Element) -&gt; Element? {
+    // 如果数组为空，first 将是 nil
+    guard let fst = first else { return nil }
+    return dropFirst().reduce(fst, nextPartialResult)
+  }
+}
+
+[1, 2, 3, 4].reduce(+) // Optional(10)
+
+// 可选值为nil时，对应的map也会返回nil，将guard改写为单return
+extension Array {
+  func reduce_alt(_ nextPartialResult: (Element, Element) -&gt; Element)
+  -&gt; Element?
+  {
+    return first.map {
+      dropFirst().reduce($0, nextPartialResult)
+    }
+  }
+}
+</code></pre></div></div>
+<h4 id="10-可选值-flatmap">10. 可选值 flatMap</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let stringNumbers = ["1", "2", "3", "foo"]
+let x = stringNumbers.first.map { Int($0) } // Optional(Optional(1))
+
+// flatMap 可以把结果展平为单个可选值
+let y = stringNumbers.first.flatMap { Int($0) } // Optional(1)
+
+if let a = stringNumbers.first, let b = Int(a) {
+  print(b)
+} // 1
+// flatMap与if let非常相似
+
+let urlString = "https://www.objc.io/logo.png"
+let view = URL(string: urlString)
+.flatMap { try? Data(contentsOf: $0) }
+.flatMap { UIImage(data: $0) }
+.map { UIImageView(image: $0) }
+if let view = view {
+  PlaygroundPage.current.liveView = view
+}
+
+// 可选链也和 flatMap 很相似：i?.advance(by: 1) 实际上和 i.flatMap { $0.advance(by: 1) } 是等价的。
+
+// 多个 if let 语句等价于 flatMap
+extension Optional {
+  func flatMap&lt;U&gt;(transform: (Wrapped) -&gt; U?) -&gt; U? {
+    if let value = self, let transformed = transform(value) {
+      return transformed
+    }
+    return nil
+  }
+}
+</code></pre></div></div>
+<h4 id="11-使用-flatmap-过滤-nil">11. 使用 flatMap 过滤 nil</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let numbers = ["1", "2", "3", "foo"]
+var sum = 0
+for case let i? in numbers.map({ Int($0) }) {
+  sum += i
+}
+sum // 6
+
+// 用 ?? 来把 nil 替换成 0
+numbers.map { Int($0) }.reduce(0) { $0 + ($1 ?? 0) } // 6
+// 将 nil 过滤出去并将非 nil 值进行解包的 map
+numbers.flatMap { Int($0) }.reduce(0, +) // 6
+// 把一个映射为可选值的序列进行展平
+
+func flatten&lt;S: Sequence, T&gt;
+(source: S) -&gt; [T] where S.Element == T? {
+  let filtered = source.lazy.filter { $0 != nil }
+  return filtered.map { $0! }
+}
+// 全局函数，协议扩展不支持两个占位符语句
+
+extension Sequence {
+  func flatMap&lt;U&gt;(transform: (Element) -&gt; U?) -&gt; [U] {
+    return flatten(source: self.lazy.map(transform))
+  }
+}
+//  lazy 将数组的实际创建推迟到了使用前的最后一刻,处理很大的数组时，避免不必要的中间结果的缓冲区内存申请。
+</code></pre></div></div>
+<h4 id="12-可选值判等">12. 可选值判等</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let regex = "^Hello$"
+// ...
+if regex.first == "^" {
+  // 只匹配字符串开头
+}
+
+func ==&lt;T: Equatable&gt;(lhs: T?, rhs: T?) -&gt; Bool {
+  switch (lhs, rhs) {
+    case (nil, nil): return true
+    case let (x?, y?): return x == y
+    case (_?, nil), (nil, _?): return false
+  }
+}
+// 重载只对可以判等的可选值类型有效
+
+// 我们其实并不需要将 "^" 声明为可选值
+if regex.first == Optional("^") { // or: == .some("^")
+  // 只匹配字符串开头
+}
+// 当你在使用一个非可选值的时候，如果需要匹配可选值类型，Swift 会将它“升级”为一个可选值然后使用
+
+// 两者都可选
+func == &lt;T: Equatable&gt;(lhs: T?, rhs: T?) -&gt; Bool
+// lhs 非可选
+func == &lt;T: Equatable&gt;(lhs: T, rhs: T?) -&gt; Bool
+// rhs 非可选
+func == &lt;T: Equatable&gt;(lhs: T?, rhs: T) -&gt; Bool
+// 我们只需要第一个版本，编译器会帮助我们将值在需要时转变为可选值。
+
+var dictWithNils: [String: Int?] = [
+  "one": 1,
+  "two": 2,
+  "none": nil
+]
+
+dictWithNils["two"] = nil
+dictWithNils // ["none": nil, "one": Optional(1)]
+// 将“two”键移除了
+
+dictWithNils["two"] = Optional(nil)
+dictWithNils["two"] = .some(nil)
+dictWithNils["two"]? = nil
+dictWithNils // ["none": nil, "one": Optional(1), "two": nil]
+
+dictWithNils["three"]? = nil
+dictWithNils.index(forKey: "three") // nil
+</code></pre></div></div>
+<h4 id="13-equatable-和-">13. Equatable 和 ==</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 两个可选值整数的数组
+let a: [Int?] = [1, 2, nil]
+let b: [Int?] = [1, 2, nil]
+// 错误：binary operator '==' cannot be applied to two [Int?] operands
+a == b
+
+// 数组中的元素是遵守 Equatable 协议
+func ==&lt;Element : Equatable&gt;(lhs: [Element], rhs: [Element]) -&gt; Bool
+
+// 未来，届时代码会这样：
+extension Optional: Equatable where Wrapped: Equatable {
+  // 没有必要写任何东西，因为 == 已经被实现了
+}
+
+// 现在为可选值的数组实现 ==
+func ==&lt;T: Equatable&gt;(lhs: [T?], rhs: [T?]) -&gt; Bool {
+  return lhs.elementsEqual(rhs) { $0 == $1 }
+}
+</code></pre></div></div>
+<h4 id="14-可选值比较">14. 可选值比较</h4>
+<ul>
+  <li>和 == 类似，对于可选值曾经也有像是 &lt;、&gt;、&lt;= 和 &gt;= 这些操作符。在 Swift 3.0 中，这些操作符被从可选值中移除了，因为它们可能会导致意外的结果。<br />
+比如说，nil &lt; .some(_) 以前将返回 true。在与高阶函数或者可选绑定结合起来使用的时候，会产生很多意外。</li>
+  <li>如果你想要在可选值之间进行除了相等之外的关系比较的话，现在你需要先对它们进行解包，然后明确地指出 nil 要如何处理。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let temps = ["-459.67", "98.6", "0", "warm"]
+let belowFreezing = temps.filter { Double($0) &lt; 0 }
+// Double("warm") 将会返回 nil，而 nil 是小于 0 的
+</code></pre></div></div>
+<h3 id="四强制解包的时机">四、强制解包的时机</h3>
+<ul>
+  <li>保证安全的情况下，可以使用强制解包。</li>
+  <li>产生错误的值强制解包终止程序会方便报错。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func flatten&lt;S: Sequence, T&gt;
+(source: S) -&gt; [T] where S.Element == T? {
+  let filtered = source.lazy.filter { $0 != nil }
+  return filtered.map { $0! }
+}
+// filter过滤了nil元素，可以强制解包
+
+let ages = [
+  "Tim": 53, "Angela": 54, "Craig": 44,
+  "Jony": 47, "Chris": 37, "Michael": 34,
+]
+ages.keys
+.filter { name in ages[name]! &lt; 50 }
+.sorted()
+// ["Chris", "Craig", "Jony", "Michael"]
+// 键都来自字典，非常安全
+
+ages.filter { (_, age) in age &lt; 50 }
+.map { (name, _) in name }
+.sorted()
+// ["Chris", "Craig", "Jony", "Michael"]
+// 避免不必要的用键进行查找
+</code></pre></div></div>
+<h4 id="1-改进强制解包的错误信息">1. 改进强制解包的错误信息</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>infix operator !!
+func !! &lt;T&gt;(wrapped: T?, failureText: @autoclosure () -&gt; String) -&gt; T {
+  if let x = wrapped { return x }
+  fatalError(failureText())
+}
+
+let s = "foo"
+let i = Int(s) !! "Expecting integer, got \"\(s)\"
+</code></pre></div></div>
+<h4 id="2-在调试版本中进行断言">2. 在调试版本中进行断言</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>infix operator !?
+func !?&lt;T: ExpressibleByIntegerLiteral&gt;
+(wrapped: T?, failureText: @autoclosure () -&gt; String) -&gt; T
+{
+  assert(wrapped != nil, failureText())
+  return wrapped ?? 0
+}
+
+// 在调试时触发断言，但是在发布版本中打印 0：
+let s = "20"
+let i = Int(s) !? "Expecting integer, got \"\(s)\""
+
+// 对其字面量转换协议进行重载，可以覆盖不少能够有默认值的类型
+func !?&lt;T: ExpressibleByArrayLiteral&gt;
+(wrapped: T?, failureText: @autoclosure () -&gt; String) -&gt; T
+{
+  assert(wrapped != nil, failureText())
+  return wrapped ?? []
+}
+
+func !?&lt;T: ExpressibleByStringLiteral&gt;
+  (wrapped: T?, failureText: @autoclosure () -&gt; String) -&gt; T
+  {
+  assert(wrapped != nil, failureText)
+  return wrapped ?? ""
+}
+
+func !?&lt;T&gt;(wrapped: T?,
+nilDefault: @autoclosure () -&gt; (value: T, text: String)) -&gt; T
+{
+  assert(wrapped != nil, nilDefault().text)
+  return wrapped ?? nilDefault().value
+}
+// 调试版本中断言，发布版本中返回 5
+Int(s) !? (5, "Expected integer")
+
+swift func !?(wrapped: ()?, failureText: @autoclosure () -&gt; String) {
+  assert(wrapped != nil, failureText)
+}
+var output: String? = nil output?.write(“something”) !? “Wasn’t expecting chained nil here
+
+</code></pre></div></div>
+<h3 id="五多灾多难的隐式解包可选值">五、多灾多难的隐式解包可选值</h3>
+<p>隐式解包可选值使用时自动强制解包，它用在类型的后面加一个感叹号来表示，比如 UIView!，它们依然是可选值。使用隐式解包的原因：</p>
+<ul>
+  <li>还需要到 Objective-C 里去调用那些没有检查返回是否存在的代码。</li>
+  <li>一个值只是很短暂地为 nil，在一段时间后，它就再也不会是 nil。比如：ViewController初始化后，view没被加载时，outlet引用还没创建。</li>
+</ul>
+
+<h4 id="1-隐式可选值行为">1. 隐式可选值行为</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 隐式解包仍具有可选值的特性
+var s: String! = "Hello"
+s?.isEmpty // Optional(false)
+if let s = s { print(s) }
+s = nil
+s ?? "Goodbye" // Goodbye
+
+// 隐式可选值会尽可能地隐藏它们的可选值特性，在行为上还是有不一样的地方。
+// 你不能将一个隐式解包的值通过 inout 的方法传递给一个函数：
+func increment(inout x: Int) {
+x += 1
+}
+var i = 1 // 普通的 Int
+increment(&amp;i) // 将 i 增加为 2
+var j: Int! = 1 // 隐式解包的 Int
+increment(&amp;j)
+// 错误：Cannot pass immutable value of type 'Int' as inout argument
+</code></pre></div></div>
+:ET

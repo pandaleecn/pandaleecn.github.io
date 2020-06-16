@@ -1,0 +1,612 @@
+I"�a<h3 id="一数组">一、数组</h3>
+<h4 id="1-数组和可变性">1. 数组和可变性</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let fibs = [0, 1, 1, 2, 3, 5]
+var mutableFibs = [0, 1, 1, 2, 3, 5]
+mutableFibs.append(8)
+mutableFibs.append(contentsOf: [13, 21])
+mutableFibs // [0, 1, 1, 2, 3, 5, 8, 13, 21]
+
+let a = NSMutableArray(array: [1,2,3])
+// 我们不想让 b 发生改变
+let b: NSArray = a
+// 但是事实上它依然能够被 a 影响并改变
+a.insert(4, at: 3)
+b // ( 1, 2, 3, 4 )
+
+// 正确的方式是在赋值时，先手动进行复制：
+let c = NSMutableArray(array: [1,2,3])
+// 我们不想让 d 发生改变
+let d = c.copy() as! NSArray
+c.insert(4, at: 3)
+d // ( 1, 2, 3 )
+
+</code></pre></div></div>
+<ul>
+  <li>数组只有一种统一的类型，可以通过在声明时使用 var 而非 let 来将数组定义为可变的。</li>
+  <li>当你使用 let 声明第二个数组，并将第一个数组赋值给它时，可以保证这个新的数组是不会改变的，因为这里没有共用的引用。</li>
+  <li>创建如此多的复制有可能造成性能问题，不过实际上 Swift 标准库中的所有集合类型都使用了“写时复制”这一技术，它能够保证只在必要的时候对数据进行复制。在我们的例子中，直到 y.append 被调用的之前，x 和 y 都将共享内部的存储。</li>
+</ul>
+
+<h4 id="2-数组和可选值">2. 数组和可选值</h4>
+<ul>
+  <li>数组索引的使用方式
+    <ul>
+      <li>想要迭代数组？ for x in array</li>
+      <li>想要迭代除了第一个元素以外的数组其余部分？ for x in array.dropFirst()</li>
+      <li>想要迭代除了最后 5 个元素以外的数组？ for x in array.dropLast(5)</li>
+      <li>想要列举数组中的元素和对应的下标？ for (num, element) in collection.enumerated()</li>
+      <li>想要寻找一个指定元素的位置？ if let idx = array.index { someMatchingLogic($0) }</li>
+      <li>想要对数组中的所有元素进行变形？ array.map { someTransformation($0) }</li>
+      <li>想要筛选出符合某个标准的元素？ array.filter { someCriteria($0) &gt; }</li>
+    </ul>
+  </li>
+  <li>将结果进行强制解包是一个坏习惯，很可能强制解包了本来不应该解包的东西，为了避免，数组没有给可选值的选项。</li>
+  <li>first 和 last 属性本身是可选值类型，当数组为空时，它们返回 nil。如果数组为空时，removeLast 将会导致崩溃，而 popLast 将在数组不为空时删除最后一个元素并返回它，在数组为空时，它将不执行任何操作，直接返回 nil。</li>
+</ul>
+
+<h4 id="3-数组变形">3. 数组变形</h4>
+<ul>
+  <li>Map的三大优势
+    <ul>
+      <li>很短，代码清晰。</li>
+      <li>不会改变值，可直接声明为let。</li>
+      <li>map函数创建简单，可通过泛型函数封装。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var squared: [Int] = []
+for fib in fibs {
+squared.append(fib * fib)
+}
+squared // [0, 1, 1, 4, 9, 25]
+
+let squares = fibs.map { fib in fib * fib }
+squares // [0, 1, 1, 4, 9, 25]
+
+extension Array {
+  func map&lt;T&gt;(_ transform: (Element) -&gt; T) -&gt; [T] {
+    var result: [T] = []
+    result.reserveCapacity(count)
+    for x in self {
+      result.append(transform(x))
+    }
+    return result
+  }
+}
+</code></pre></div></div>
+<ul>
+  <li>使用函数将行为参数化
+    <ul>
+      <li>map 和 flatMap — 如何对元素进行变换</li>
+      <li>filter — 元素是否应该被包含在结果中</li>
+      <li>reduce — 如何将元素合并到一个总和的值中</li>
+      <li>sequence — 序列中下一个元素应该是什么？</li>
+      <li>forEach — 对于一个元素，应该执行怎样的操作</li>
+      <li>sort，lexicographicCompare 和 partition — 两个元素应该以怎样的顺序进行排列</li>
+      <li>index，first 和 contains — 元素是否符合某个条件</li>
+      <li>min 和 max — 两个元素中的最小/最大值是哪个</li>
+      <li>elementsEqual 和 starts — 两个元素是否相等</li>
+      <li>split — 这个元素是否是一个分割符</li>
+      <li>prefix - 当判断为真的时候，将元素滤出到结果中。一旦不为真，就将剩余的抛弃。和 filter 类似，但是会提前退出。这个函数在处理无限序列或者是延迟计算 (lazily-computed) 的序列时会非常有用。</li>
+      <li>drop - 当判断为真的时候，丢弃元素。一旦不为真，返回将其余的元素。和 prefix(while:) 类似，不过返回相反的集合。</li>
+    </ul>
+  </li>
+  <li>函数参数化的好处
+    <ul>
+      <li>摆脱代码中杂乱无用部分，逻辑更加清晰。</li>
+      <li>一些函数的默认行为使函数更易读。</li>
+    </ul>
+  </li>
+  <li>其他实用函数
+    <ul>
+      <li>accumulate — 累加，和 reduce 类似，不过是将所有元素合并到一个数组中，并保留合并时每一步的值。</li>
+      <li>all(matching:) 和 none(matching:) — 测试序列中是不是所有元素都满足某个标准，以及是不是没有任何元素满足某个标准。它们可以通过 contains 和它进行了精心对应的否定形式来构建。</li>
+      <li>count(where:) — 计算满足条件的元素的个数，和 filter 相似，但是不会构建数组。</li>
+      <li>indices(where:) — 返回一个包含满足某个标准的所有元素的索引的列表，和 index(where:) 类似，但是不会在遇到首个元素时就停止。</li>
+    </ul>
+  </li>
+  <li>自定义扩展的封装</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let names = ["Paula", "Elena", "Zoe"]
+var lastNameEndingInA: String?
+for name in names.reversed() where name.hasSuffix("a") {
+  lastNameEndingInA = name
+  break
+}
+lastNameEndingInA // Optional("Elena")
+
+extension Sequence {
+  func last(where predicate: (Element) -&gt; Bool) -&gt; Element? {
+    for element in reversed() where predicate(element) {
+      return element
+    }
+    return nil
+  }
+}
+
+guard let match = someSequence.last(where: { $0.passesTest() })
+else { return }
+
+</code></pre></div></div>
+<ul>
+  <li>可变的带有状态的闭包</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension Array {
+
+    // 创建一个中间变量存储每一步的值，然后使用map从中间值逐步计算结果数组
+    func accumulate&lt;Result&gt;(_ initialResult: Result, _ nextPartialResult: (Result, Element) -&gt; Result) -&gt; [Result]
+    {
+        var running = initialResult
+
+        return map { next in
+            running = nextPartialResult(running, next)
+            return running
+        }
+    }
+}
+
+arr.accumulate(0) { (lastRe, no) -&gt; Int in
+    return lastRe + no
+}
+
+arr.accumulate(0) { lastRe, no in
+    lastRe + no
+}
+
+arr.accumulate(0, +)
+
+</code></pre></div></div>
+
+<ul>
+  <li>Filter</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 对 0..&lt;10 进行 map 来得到所有平方数，然后再用 filter 过滤出其中的偶数
+(1..&lt;10).map { $0 * $0 }.filter { $0 % 2 == 0 } // [4, 16, 36, 64]
+
+// 错误
+bigArray.filter { someCondition }.count &gt; 0
+// 正确
+bigArray.contains { someCondition }
+
+// 封装 !sequence.contains { !condition }
+extension Sequence {
+    public func all(matching predicate: (Element) -&gt; Bool) -&gt; Bool {
+        // 对于一个条件，如果没有元素不满足它的话，那意味着所有元素都满足它：
+        return !contains { !predicate($0) }
+    }
+}
+let evenNums = nums.filter { $0 % 2 == 0 } // [2, 4, 6, 8, 10]
+evenNums.all { $0 % 2 == 0 } // true
+
+</code></pre></div></div>
+
+<ul>
+  <li>Reduce<br />
+reduce方法：将一个初始值和一个将中间值与序列中的元素进行合并的函数进行抽象。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let fibs = [0, 1, 1, 2, 3, 5]
+var total = 0
+for num in fibs {
+  total = total + num
+}
+total // 12
+
+// 改写
+let sum = fibs.reduce(0) { total, num in total + num } // 12
+fibs.reduce(0, +) // 12
+
+fibs.reduce("") { str, num in str + "\(num), " } // 0, 1, 1, 2, 3, 5,
+
+// reduce的实现
+extension Array {
+    func reduce&lt;Result&gt;(_ initialResult: Result,
+                        _ nextPartialResult: (Result, Element) -&gt; Result) -&gt; Result
+    {
+        var result = initialResult
+        for x in self {
+            result = nextPartialResult(result, x)
+        }
+        return result
+    }
+}
+
+// 用reduce实现map和filter，复杂度：O(n2)
+extension Array {
+    func map2&lt;T&gt;(_ transform: (Element) -&gt; T) -&gt; [T] {
+        return reduce([]) {
+            $0 + [transform($1)]
+        }
+    }
+    func filter2(_ isIncluded: (Element) -&gt; Bool) -&gt; [Element] {
+        return reduce([]) {
+            isIncluded($1) ? $0 + [$1] : $0
+        }
+    }
+}
+
+// 优化，复杂度：O(n)
+public func reduce&lt;Result&gt;(into initialResult: Result,
+                           _ updateAccumulatingResult:
+    (_ partialResult: inout Result, Element) throws -&gt; ()
+) rethrows -&gt; Result
+
+extension Array {
+    func filter3(_ isIncluded: (Element) -&gt; Bool) -&gt; [Element] {
+        return reduce(into: []) { result, element in
+            if isIncluded(element) {
+                result.append(element)
+            }
+        }
+    }
+}
+</code></pre></div></div>
+
+<ul>
+  <li>flatMap</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func extractLinks(markdownFile: String) -&gt; [URL]
+let markdownFiles: [String] = // ...
+let nestedLinks = markdownFiles.map(extractLinks)
+let links = nestedLinks.joined()
+
+// 将map和joined操作合二为一
+markdownFiles.flatMap(links)
+
+extension Array {
+  func flatMap&lt;T&gt;(_ transform: (Element) -&gt; [T]) -&gt; [T] {
+      var result: [T] = []
+      for x in self {
+        result.append(contentsOf: transform(x))
+      }
+      return result
+    }
+}
+
+// 将不同数组的元素配对合并
+let suits = ["♠︎", "♥︎", "♣︎", "♦︎"]
+let ranks = ["J","Q","K","A"]
+let result = suits.flatMap { suit in
+  ranks.map { rank in
+    (suit, rank)
+  }
+}
+/*
+[("♠︎", "J"), ("♠︎", "Q"), ("♠︎", "K"), ("♠︎", "A"), ("♥︎", "J"), ("♥︎",
+"Q"), ("♥︎", "K"), ("♥︎", "A"), ("♣︎", "J"), ("♣︎", "Q"), ("♣︎", "K"),
+("♣︎", "A"), ("♦︎", "J"), ("♦︎", "Q"), ("♦︎", "K"), ("♦︎", "A")]
+*/
+
+</code></pre></div></div>
+
+<ul>
+  <li>forEach</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for element in [1,2,3] {
+  print(element)
+}
+
+[1,2,3].forEach { element in
+  print(element)
+}
+
+extension Array where Element: Equatable {
+  func index(of element: Element) -&gt; Int? {
+    for idx in self.indices where self[idx] == element {
+      return idx
+    }
+    return nil
+  }
+}
+
+// 错误，forEach中的return并不能返回到外部番薯的作用域之外，产生警告
+extension Array where Element: Equatable {
+  func index_foreach(of element: Element) -&gt; Int? {
+    self.indices.filter { idx in
+    self[idx] == element
+    }.forEach { idx in
+      return idx
+    }
+    return nil
+  }
+}
+
+// 错误，仅仅从闭包中返回，并不会终止循环
+(1..&lt;10).forEach { number in
+  print(number)
+  if number &gt; 2 { return }
+}
+
+</code></pre></div></div>
+
+<h4 id="4-数组类型">4. 数组类型</h4>
+<ul>
+  <li>切片<br />
+<img src="http://files.pandaleo.cn/f63b30887af7b9e47d198158a37466ea.png?imageMogr2/thumbnail/!50p" alt="" /></li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过切片获取某个范围中的元素
+let slice = fibs[1...]
+slice // [1, 1, 2, 3, 5]
+type(of: slice) // ArraySlice&lt;Int&gt;
+
+// 切片类型是数组的一种表示方式，数据一样，可以用Array构建方法转化。
+let newArray = Array(slice)
+type(of: newArray) // Array&lt;Int&gt;
+
+</code></pre></div></div>
+<ul>
+  <li>桥接<br />
+Swift数组可以桥接到OC和C中，由于NSArray只能持有对象，在桥接转换时，编译器和运行时会将不兼容的值（比如Swift的枚举）用一个不透明的box对象包装起来。值类型也会自动桥接到OC中对应的类型，如 Int，Bool 和 String，甚至 Dictionary 和 Set。</li>
+</ul>
+
+<h3 id="二字典dictionary">二、字典Dictionary</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 定义app设置界面，使用字典作为数据模型
+enum Setting {
+  case text(String)
+  case int(Int)
+  case bool(Bool)
+}
+let defaultSettings: [String:Setting] = [
+  "Airplane Mode": .bool(false),
+  "Name": .text("My iPhone"),
+]
+defaultSettings["Name"] // Optional(Setting.text("My iPhone"))
+
+</code></pre></div></div>
+<h4 id="1定义">1.定义</h4>
+<ul>
+  <li>字典包含建和对应的值，一个字典中，每个键只能出现一次。</li>
+  <li>和数组的区别
+    <ul>
+      <li>耗时不同。通过键来获取值所花费的平均时间是常数量级的。作为对比，在数组中搜寻一个特定元素所花的时间将与数组尺寸成正比。</li>
+      <li>顺序不同。字典是无序的，使用 for 循环来枚举字典中的键值对时，顺序是不确定的。</li>
+      <li>返回不同。字典查找将返回的是可选值，当特定键不存在时，下标查询返回 nil。在数组中，使用越界下标进行访问将会导致程序崩溃。</li>
+      <li>使用方式不同。字典的键从其他渠道获取，数组较少使用索引。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="2可变性">2.可变性</h4>
+<ul>
+  <li>let定义不可变，var声明可变</li>
+  <li>移除方式
+    <ul>
+      <li>下标值设为nil</li>
+      <li>removeValue(forKey:)，会将删除值返回，不存在返回nil</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 改变不可变字典时，先进行复制，原字典不会改变
+var userSettings = defaultSettings
+userSettings["Name"] = .text("Jared's iPhone")
+userSettings["Do Not Disturb"] = .bool(true)
+
+// updateValue(_:forKey:)更新时，会返回更新前的值
+let oldName = userSettings.updateValue(.text("Jane's iPhone"), forKey: "Name")
+userSettings["Name"] // Optional(Setting.text("Jane\'s iPhone"))
+oldName // Optional(Setting.text("Jared\'s iPhone"))
+</code></pre></div></div>
+
+<h4 id="3有用的字典方法">3.有用的字典方法</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// merge，合并字典
+// 合并键值对，使用了 { $1 } 来作为合并两个值的策略。
+// 某个键同时存在于 settings 和 overriddenSettings 中时，使用 overriddenSetttings 中的值。
+
+var settings = defaultSettings
+let overriddenSettings: [String:Setting] = ["Name": .text("Jane's iPhone")]
+settings.merge(overriddenSettings, uniquingKeysWith: { $1 })
+settings
+// ["Name": Setting.text("Jane\'s iPhone"), "Airplane Mode": Setting.bool(false)]
+
+// 计算序列中某个元素出现的次数，遇到相同键使用“+策略”合并
+extension Sequence where Element: Hashable {
+  var frequencies: [Element:Int] {
+    let frequencyPairs = self.map { ($0, 1) }
+    return Dictionary(frequencyPairs, uniquingKeysWith: +)
+  }
+}
+let frequencies = "hello".frequencies // ["e": 1, "o": 1, "l": 2, "h": 1]
+frequencies.filter { $0.value &gt; 1 } // ["l": 2]
+
+// 保持字典结构，只对值进行映射
+let settingsAsStrings = settings.mapValues { setting -&gt; String in
+  switch setting {
+    case .text(let text): return text
+    case .int(let number): return String(number)
+    case .bool(let value): return String(value)
+  }
+}
+settingsAsStrings // ["Name": "Jane\'s iPhone", "Airplane Mode": "false"]
+
+</code></pre></div></div>
+
+<h4 id="4hashable要求">4.Hashable要求</h4>
+<ul>
+  <li>字典就是哈希表，通过键的hashValue为每个键指定一个位置，和对应的存储。因此Key类型需要遵守Hashable协议，标准库中所有基本数据类型都遵守Hashable协议，包括：字符串、整数、浮点数、布尔值。不带关联值的枚举类型自动遵守Hashable。</li>
+  <li>将自定义的类型用作字典的键，必须手动添加 Hashable 并满足它，实现 hashValue 属性。另外，因为 Hashable 本身是对 Equatable 的扩展，因此你还需要为你的类型重载 == 运算符，必须保证哈希不变原则。
+    <ul>
+      <li>两个同样的实例 (由你实现的 == 定义相同)，必须拥有同样的哈希值。不过反过来不必为真：两个相同哈希值的实例不一定需要相等。不同的哈希值的数量是有限的，然而很多可以被哈希的类型 (比如字符串) 的个数是无穷的。</li>
+      <li>哈希值可能重复这一特性，意味着 Dictionary 必须能够处理哈希碰撞。</li>
+      <li>一个关于自动满足 Equatable 和 Hashable 的提案已经被接受了。一旦这个特性被实现并且合并，我们就可以让编译器自动为我们的自定义类型生成满足 Equatable 和 Hashable 协议的代码。</li>
+      <li>如果你在将一个对象用作字典键后，改变了它的内容，它的哈希值和/或相等特性往往也会发生改变。这时候你将无法再在字典中找到它。这时字典会在错误的位置存储对象，这将导致字典内部存储的错误。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="三set">三、Set</h3>
+<h4 id="1定义-1">1.定义</h4>
+<p>集合是一组无序的元素，每个元素只会出现一次，可以将集合想像为一个只存储了键而没有存储值的字典。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Set 遵守 ExpressibleByArrayLiteral 协议，可以用数组字面量的方式初始化一个集合
+let naturals: Set = [1, 2, 3, 2]
+naturals // [2, 3, 1]
+naturals.contains(3) // true
+naturals.contains(0) // false
+</code></pre></div></div>
+<h4 id="2集合代数">2.集合代数</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 在一个集合中求另一个集合的补集
+let iPods: Set = ["iPod touch", "iPod nano", "iPod mini",
+"iPod shuffle", "iPod Classic"]
+let discontinuedIPods: Set = ["iPod mini", "iPod Classic",
+"iPod nano", "iPod shuffle"]
+let currentIPods = iPods.subtracting(discontinuedIPods) // ["iPod touch"]
+
+// 两个集合的交集，找出两个集合中都含有的元素
+let touchscreen: Set = ["iPhone", "iPad", "iPod touch", "iPod nano"]
+let iPodsWithTouch = iPods.intersection(touchscreen)
+// ["iPod touch", "iPod nano"]
+
+// 两个集合的并集，将两个集合合并为一个 (当然，移除那些重复多余的)
+// 几乎所有的集合操作都有不可变版本以及可变版本的形式，后一种都以 form... 开头
+var discontinued: Set = ["iBook", "Powerbook", "Power Mac"]
+discontinued.formUnion(discontinuedIPods)
+discontinued
+/*
+["iBook", "Powerbook", "Power Mac", "iPod Classic", "iPod mini",
+"iPod shuffle", "iPod nano"]
+*/
+
+</code></pre></div></div>
+<h4 id="3索引集合和字符集合">3.索引集合和字符集合</h4>
+<ul>
+  <li>IndexSet 表示了一个由正整数组成的集合，会存储连续的范围，只存储选择的首位和末位两个整数值
+，比Set<Int>更加高效。</Int></li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var indices = IndexSet()
+indices.insert(integersIn: 1..&lt;5)
+indices.insert(integersIn: 11..&lt;15)
+let evenIndices = indices.filter { $0 % 2 == 0 } // [2, 4, 12, 14]
+</code></pre></div></div>
+<ul>
+  <li>CharacterSet 是一个高效的存储 Unicode 码点 (code point) 的集合，不是集合类型，名字是OC导入时生成的，UnicodeScalarSet命名会更加准确。</li>
+</ul>
+
+<h4 id="4在闭包中使用集合">4.在闭包中使用集合</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 按原来顺序找到序列中所有不重复的元素
+extension Sequence where Element: Hashable {
+  func unique() -&gt; [Element] {
+    var seen: Set&lt;Element&gt; = []
+    return filter { element in
+      if seen.contains(element) {
+        return false
+      } else {
+        seen.insert(element)
+        return true
+      }
+    }
+  }
+}
+[1,2,3,12,1,3,4,5,6,4,6].unique() // [1, 2, 3, 12, 4, 5, 6]
+
+</code></pre></div></div>
+<h3 id="四range">四、Range</h3>
+<h4 id="1定义-2">1.定义</h4>
+<ul>
+  <li>范围代表的是两个值的区间，它由上下边界进行定义。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过 ..&lt; 来创建一个不包含上边界的半开范围，或者使用 ... 创建同时包含上下边界的闭合范围：
+// 0 到 9, 不包含 10
+let singleDigitNumbers = 0..&lt;10
+Array(singleDigitNumbers) // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+// 包含 "z"
+let lowercaseLetters = Character("a")...Character("z")
+
+// 这些操作符还有一些前缀和后缀的变型版本，用来表示单边的范围：
+let fromZero = 0...
+let upToZ = ..&lt;Character("z")
+</code></pre></div></div>
+<ul>
+  <li>共有八种不同的独立类型可以用来表示范围，每种类型都代表了对值的不同的约束。
+    <ul>
+      <li>最常用的两种类型是 Range (由 ..&lt; 创建的半开范围) 和 ClosedRange (由 … 创建的闭合范围)。</li>
+      <li>两者都有一个 Bound 的泛型参数：对于 Bound 的唯一的要求是它必须遵守 Comparable 协议。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 不能对 Range 或者 ClosedRange 进行迭代
+// 可以检查某个元素是否存在于范围
+singleDigitNumbers.contains(9) // true
+lowercaseLetters.overlaps("c"..&lt;"f") // true
+</code></pre></div></div>
+<ul>
+  <li>半开范围和闭合范围各有所用
+    <ul>
+      <li>只有半开范围能表达空间隔 (也就是下界和上界相等的情况，比如 5..&lt;5)。</li>
+      <li>只有闭合范围能包括其元素类型所能表达的最大值 (比如 0…Int.max)。而半开范围则要求范围上界是一个比自身所包含的最大值还要大 1 的值。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="2可数范围">2.可数范围</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for i in 0..&lt;10 {
+  print("\(i)", terminator: " ")
+} // 0 1 2 3 4 5 6 7 8 9
+</code></pre></div></div>
+<ul>
+  <li>可数范围：0..&lt;10 的类型其实是一个 CountableRange<Int>，它的元素类型需要遵守 Strideable 协议 (以整数为步长)，只有这类范围可以被迭代。</Int></li>
+  <li>可数范围的边界可以是整数或者指针类型，但不能是浮点数类型，这是由于 Stride 类型中有一个整数的约束。如果你想要对连续的浮点数值进行迭代的话，你可以通过使用 stride(from:to:by) 和 stride(from:through:by) 方法来创建序列用以迭代。Strideable 的约束使得 CountableRange 和 CountableClosedRange 遵守 RandomAccessCollection，于是我们就能够对它们进行迭代了。</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>整数步长</th>
+      <th>半开范围</th>
+      <th>闭合范围</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>元素满足 Comparable</td>
+      <td>Range</td>
+      <td>ClosedRange</td>
+    </tr>
+    <tr>
+      <td>元素满足 Strideable</td>
+      <td>CountableRange</td>
+      <td>CountableClosedRange</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="3部分范围">3.部分范围</h4>
+<p>部分范围 (partial range) 指的是将 … 或 ..&lt; 作为前置或者后置运算符来使用时所构造的范围。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Bound不满足Strideable，无法迭代
+let fromA: PartialRangeFrom&lt;Character&gt; = Character("a")...
+
+// 没有下界，无法开始迭代
+let throughZ: PartialRangeThrough&lt;Character&gt; = ...Character("z")
+let upto10: PartialRangeUpTo&lt;Int&gt; = ..&lt;10
+
+// 唯一能被迭代，不断重复调用advanced(by:1)，需要添加break退出条件
+let fromFive: CountablePartialRangeFrom&lt;Int&gt; = 5...
+</code></pre></div></div>
+<h4 id="4范围表达式">4.范围表达式</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// RangeExpression 协议
+public protocol RangeExpression {
+  associatedtype Bound: Comparable
+  func contains(_ element: Bound) -&gt; Bool
+  func relative&lt;C: _Indexable&gt;(to collection: C) -&gt; Range&lt;Bound&gt; where C.Index == Bound
+}
+
+let arr = [1,2,3,4]
+arr[2...] // [3, 4]
+arr[..&lt;1] // [1]
+arr[1...2] // [2, 3]
+arr[...] // [1, 2, 3, 4]
+type(of: arr) // Array&lt;Int&gt;
+
+</code></pre></div></div>
+:ET

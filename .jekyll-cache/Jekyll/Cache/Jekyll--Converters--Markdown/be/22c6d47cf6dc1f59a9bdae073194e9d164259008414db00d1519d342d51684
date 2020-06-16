@@ -1,0 +1,947 @@
+I"�<h3 id="一序列">一、序列</h3>
+<h4 id="1-定义">1. 定义</h4>
+<ul>
+  <li>Sequence 协议是集合类型结构中的基础，代表的是一系列具有相同类型的值，你可以对这些值进行迭代。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 简单for循环
+for element in someSequence {
+  doSomething(with: element)
+}
+
+// 满足Sequence协议的要求是提供一个返回迭代器的makeIterator()方法。
+protocol Sequence {
+  associatedtype Iterator: IteratorProtocol
+  func makeIterator() -&gt; Iterator
+  // ...
+}
+</code></pre></div></div>
+
+<h4 id="2-迭代器">2. 迭代器</h4>
+<p>序列通过创建一个迭代器来提供对元素的访问。迭代器每次产生一个序列的值，并且当遍历序列时对遍历状态进行管理。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol IteratorProtocol {
+
+  // 迭代器产生的指的类型
+  associatedtype Element
+
+  // 协议中唯一的方法，每次被调用时返回序列中下一个值，耗尽时返回nil
+  mutating func next() -&gt; Element?
+}
+
+// 迭代器定义了对应序列的元素类型
+public protocol Sequence {
+  associatedtype Element
+  associatedtype Iterator: IteratorProtocol
+  where Iterator.Element == Element
+  // ...
+}
+
+// for循环是迭代器的简写方式
+// 编译器会为序列创建一个新的迭代器，并且不断调用迭代器的 next 方法，直到它返回 nil 为止。
+var iterator = someSequence.makeIterator() while let element = iterator.next() {
+    doSomething(with: element)
+}
+
+// 无限的迭代器
+struct ConstantIterator: IteratorProtocol {
+
+  // typealias 指定 Element 的类型，为文档的目的帮助理解代码，协议越大越明显
+  typealias Element = Int
+
+  // next() 被标记为了 mutating，迭代器的本质是存在状态的。几乎所有有意义的迭代器都会要求可变状态，这样它们才能够管理在序列中的当前位置。
+  mutating func next() -&gt; Int? {
+    return 1
+  }
+
+}
+
+// 无穷打印数字1
+var iterator = ConstantIterator()
+while let x = iterator.next() {
+  print(x)
+}
+
+// FibsIterator无穷迭代器
+struct FibsIterator: IteratorProtocol {
+  var state = (0, 1)
+  mutating func next() -&gt; Int? {
+    let upcomingNumber = state.0
+    state = (state.1, state.0 + state.1)
+    return upcomingNumber
+  }
+}
+
+</code></pre></div></div>
+<ul>
+  <li>遵守序列协议</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 顺次生成字符串的所有前缀（包含本身）
+struct PrefixIterator: IteratorProtocol {
+  let string: String
+  var offset: String.Index
+  init(string: String) {
+      self.string = string
+      offset = string.startIndex
+  }
+
+  mutating func next() -&gt; Substring? {
+    guard offset &lt; string.endIndex else { return nil }
+    offset = string.index(after: offset)
+    return string[..&lt;offset]
+  }
+}
+
+struct PrefixSequence: Sequence {
+  let string: String
+
+  // 编译器从返回类型推断出管理按类型Iterator或Element的具体类型
+  func makeIterator() -&gt; PrefixIterator {
+    return PrefixIterator(string: string)
+  }
+}
+
+// for循环调用
+for prefix in PrefixSequence(string: "Hello") {
+  print(prefix)
+}
+
+/*
+H
+He
+Hel
+Hell
+Hello
+*/
+
+// 还可以执行Sequence提供的所有操作
+PrefixSequence(string: "Hello").map { $0.uppercased() }
+// ["H", "HE", "HEL", "HELL", "HELLO"]
+</code></pre></div></div>
+
+<ul>
+  <li>迭代器和值语义
+    <ul>
+      <li>StrideToIterator 是一个很简单的结构体，具有值语义。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 一个从 0 到 9 的序列
+let seq = stride(from: 0, to: 10, by: 1)
+var i1 = seq.makeIterator()
+i1.next() // Optional(0)
+i1.next() // Optional(1)
+
+var i2 = i1
+
+i1.next() // Optional(2)
+i1.next() // Optional(3)
+i2.next() // Optional(2)
+i2.next() // Optional(3)
+</code></pre></div></div>
+<ul>
+  <li>AnyIterator 是一个对别的迭代器进行封装的迭代器，它可以用来将原来的迭代器的具体类型“抹消”掉。<br />
+  比如你在创建公有 API 时想要将一个很复杂的迭代器的具体类型隐藏起来，而不暴露它的具体实现的时候，就可以使用这种迭代器。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 很少用到，需要共享时，可以直接封装到序列之中，而不是传递
+var i3 = AnyIterator(i1)
+var i4 = i3
+i3.next() // Optional(4)
+i4.next() // Optional(5)
+i3.next() // Optional(6)
+i3.next() // Optional(7)
+
+</code></pre></div></div>
+<ul>
+  <li>基于函数的迭代器和序列</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 不具有值语义
+func fibsIterator() -&gt; AnyIterator&lt;Int&gt; {
+  var state = (0, 1)
+  return AnyIterator {
+    let upcomingNumber = state.0
+    state = (state.1, state.0 + state.1)
+    return upcomingNumber
+  }
+}
+
+let fibsSequence = AnySequence(fibsIterator)
+Array(fibsSequence.prefix(10)) // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+// sequence(first:next:) 将使用第一个参数的值作为序列的首个元素，并使用 next 参数传入的闭包生成序列的后续元素，最后返回生成的序列。
+// sequence(state:next:)，可以在两次 next 闭包被调用之间保存任意的可变状态，所以它更强大一些。
+let fibsSequence2 = sequence(state: (0, 1)) {
+  // 在这里编译器需要一些类型推断的协助
+  (state: inout (Int, Int)) -&gt; Int? in
+  let upcomingNumber = state.0
+  state = (state.1, state.0 + state.1)
+  return upcomingNumber
+}
+
+Array(fibsSequence2.prefix(10)) // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+let fb3 = sequence(first: (0, 1), next: {
+    ($0.1, $0.0 + $0.1)
+})
+print(Array(fb3.prefix(10)))
+// [(0, 1), (1, 1), (1, 2), (2, 3), (3, 5), (5, 8), (8, 13), (13, 21), (21, 34), (34, 55)]
+
+</code></pre></div></div>
+<h4 id="3-无限序列">3. 无限序列</h4>
+<ul>
+  <li>sequence 对于 next 闭包的使用是被延迟的，下一个值不会被预先计算，它只在调用者需要的时候生成。</li>
+  <li>序列可以是无限的，而集合则不行。</li>
+</ul>
+
+<h4 id="4-不稳定序列">4. 不稳定序列</h4>
+<ul>
+  <li>序列并不只限于像是数组或者列表这样的传统集合数据类型，如：网络流，磁盘上的文件，UI 事件的流。数组，可以多次遍历其中的元素，而上面这些例子有时不行。</li>
+  <li>序列并不保证可以被多次遍历。斐波纳契序列元素固定，可以从 0 再次遍历，但是像是网络包的流这样的序列将会随着遍历被消耗，无法再次遍历产生同样的值。</li>
+  <li>序列不存在first属性，无法保证getter方法是非破坏的，集合类型在Collection协议保证下有first属性。</li>
+  <li>一些非集合的序列是可以被多次遍历的，如： stride(from:to:by:) 返回的 StrideTo 类型，以及 stride(from:through:by:) 所返回的 StrideThrough 类型，使用浮点数步长来获取值，这使得它们无法被描述为一个集合，所以它们只能作为序列存在。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let standardIn = AnySequence {
+  return AnyIterator {
+  readLine()
+  }
+}
+
+// 输入回车时，延迟从标准输入中读取一行，无法保证稳定性
+let numberedStdIn = standardIn.enumerated()
+  for (i, line) in numberedStdIn {
+  print("\(i+1): \(line)")
+}
+
+</code></pre></div></div>
+<h4 id="5-序列和迭代器之间的关系">5. 序列和迭代器之间的关系</h4>
+<ul>
+  <li>迭代器提供遍历状态，序列提供遍历逻辑，makeIterator 方法的目的就是创建遍历状态。</li>
+  <li>迭代器可以看作即将返回元素所组成的不稳定序列，可通过满足Sequence转换成序列。</li>
+</ul>
+
+<h4 id="6-子序列">6. 子序列</h4>
+<p>Sequence的另一个关联类型，SubSequence</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol Sequence {
+  associatedtype Element
+  associatedtype Iterator: IteratorProtocol
+  where Iterator.Element == Element
+  associatedtype SubSequence
+  // ...
+}
+</code></pre></div></div>
+<ul>
+  <li>在返回原序列的切片操作中，SubSequence被用作返回值的子类型操作
+    <ul>
+      <li>prefix 和 suffix — 获取开头或结尾 n 个元素</li>
+      <li>prefix(while:) - 从开头开始当满足条件时，</li>
+      <li>dropFirst 和 dropLast — 返回移除掉前 n 个或后 n 个元素的子序列</li>
+      <li>drop(while:) - 移除元素，直到条件不再为真，然后返回剩余元素</li>
+      <li>split — 将一个序列在指定的分隔元素时截断，返回子序列的的数组</li>
+    </ul>
+  </li>
+  <li>不确定Subsequence时，编译器会根据AnySequence<Iterator.Element>推断类型，并提供默认实现。自定义子序列时，需要提供上述方法的自定义实现。</Iterator.Element></li>
+  <li>子序列和原序列类型一致可以方便回传参数在原始集合类型的函数中使用，但在标准库中集合类型的切片类型并不一样，为了防止非常小的切片持有较大的原有集合类型，导致内存“泄露”。使用原始类型表示切片，可以将它的生命周期更好的绑定在局部作用域中。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 比较理想的SubSequence关联类型的声明
+// a. 本身也是序列。
+// b. 子序列的元素类型和其子序列类型，和原序列的对应类型一致。
+// b在Swift4.0中无法做到，编译器没有循环协议约束（Sequence会对自身进行引用）。
+associatedtype SubSequence: Sequence
+  where Element == SubSequence.Element,
+    SubSequence.SubSequence == SubSequence
+
+// 比较序列前后n个元素是否为镜像
+extension Sequence where Element: Equatable, SubSequence: Sequence, SubSequence.Element == Element
+{
+  func headMirrorsTail(_ n: Int) -&gt; Bool {
+    let head = prefix(n)
+    let tail = suffix(n).reversed()
+    return head.elementsEqual(tail)
+  }
+}
+[1,2,3,4,2,1].headMirrorsTail(2) // true
+
+</code></pre></div></div>
+
+<ul>
+  <li>链表</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个简单的链表枚举
+enum List&lt;Element&gt; {
+  case end
+  /// indirect声明node为引用，枚举是值类型，无法引用自身，否则无法计算尺寸
+  indirect case node(Element, next: List&lt;Element&gt;)
+}
+
+let emptyList = List&lt;Int&gt;.end
+let oneElementList = List.node(1, next: emptyList)
+// node(1, next: List&lt;Swift.Int&gt;.end)
+
+extension List {
+  /// 在链表前方添加一个值为 `x` 的节点，并返回这个链表
+  func cons(_ x: Element) -&gt; List {
+    return .node(x, next: self)
+  }
+}
+// 一个拥有 3 个元素的链表 (3 2 1)
+let list = List&lt;Int&gt;.end.cons(1).cons(2).cons(3)
+/*
+node(3, next: List&lt;Swift.Int&gt;.node(2, next: List&lt;Swift.Int&gt;.node(1,
+next: List&lt;Swift.Int&gt;.end)))
+*/
+
+extension List: ExpressibleByArrayLiteral {
+  init(arrayLiteral elements: Element...) {
+    self = elements.reversed().reduce(.end) { partialList, element in
+      partialList.cons(element)
+    }
+  }
+}
+let list2: List = [3,2,1]
+/*
+node(3, next: List&lt;Swift.Int&gt;.node(2, next: List&lt;Swift.Int&gt;.node(1,
+next: List&lt;Swift.Int&gt;.end)))
+*/
+</code></pre></div></div>
+<p><img src="http://files.pandaleo.cn/2edbe499744a692d5b3e6516161c2e06.png?imageMogr2/thumbnail/!50p" alt="链表共享" />
+链表共享</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension List {
+  mutating func push(_ x: Element) {
+    self = self.cons(x)
+  }
+  mutating func pop() -&gt; Element? {
+    switch self {
+      case .end: return nil
+      case let .node(x, next: tail):
+      self = tail
+      return x
+    }
+  }
+}
+
+// 链表具有持久性和不可变性，变量值改变了列表所持有的节点
+var stack: List&lt;Int&gt; = [3,2,1]
+var a = stack
+var b = stack
+a.pop() // Optional(3)
+a.pop() // Optional(2)
+a.pop() // Optional(1)
+stack.pop() // Optional(3)
+stack.push(4)
+b.pop() // Optional(3)
+b.pop() // Optional(2)
+b.pop() // Optional(1)
+stack.pop() // Optional(4)
+stack.pop() // Optional(2)
+stack.pop() // Optional(1)
+</code></pre></div></div>
+<p><img src="http://files.pandaleo.cn/f4ab9819e5637c92736292950a458d99.png?imageMogr2/thumbnail/!50p" alt="" />
+链表迭代器
+<img src="http://files.pandaleo.cn/4ae369d32c520e99230558da4ff0c0a2.png?imageMogr2/thumbnail/!50p" alt="" />
+链表的内存管理</p>
+
+<ul>
+  <li>让List遵守Sequence</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension List: IteratorProtocol, Sequence {
+  mutating func next() -&gt; Element? {
+    return pop()
+  }
+}
+
+let list: List = ["1", "2", "3"]
+for x in list {
+  print("\(x) ", terminator: "")
+} // 1 2 3
+
+list.joined(separator: ",") // 1,2,3
+list.contains("2") // true
+list.flatMap { Int($0) } // [1, 2, 3]
+list.elementsEqual(["1", "2", "3"]) // true
+</code></pre></div></div>
+<h3 id="二集合类型">二、集合类型</h3>
+<ul>
+  <li>集合类型 (Collection) 指的是那些稳定的序列，它们能够被多次遍历且保持一致。元素可以通过先行遍历和下标索引的方式被获取到。和序列不同，集合类型不能是无限的。</li>
+  <li>Collection 协议是建立在 Sequence 协议上的。除了从 Sequence 继承了全部方法以外，还获取了一些新的能力。比如 count 属性。</li>
+  <li>集合类型在标准库中运用广泛： Array，Dictionary，Set，String ，CountableRange， UnsafeBufferPointer，Data ，IndexSet。</li>
+</ul>
+
+<h4 id="1-自定义的集合类型">1. 自定义的集合类型</h4>
+<ul>
+  <li>为队列设计协议
+    <ul>
+      <li>注释非常重要，它和实际的方法名及类型名一样，也是协议的一部分，这些注释用来保证协议应有的行为。</li>
+      <li>没有给出超过我们现在所做的范围的承诺，如复杂度、peek操作、线程安全、先进先出。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个能够将元素入队和出队的类型
+protocol Queue {
+  /// 在 `self` 中所持有的元素的类型
+  associatedtype Element
+  /// 将 `newElement` 入队到 `self`
+  mutating func enqueue(_ newElement: Element)
+  /// 从 `self` 出队一个元素
+  mutating func dequeue() -&gt; Element?
+}
+</code></pre></div></div>
+
+<ul>
+  <li>队列的实现</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个高效的 FIFO 队列，其中元素类型为 `Element`
+struct FIFOQueue&lt;Element&gt;: Queue {
+  private var left: [Element] = []
+  private var right: [Element] = []
+  /// 将元素添加到队列最后
+  /// - 复杂度: O(1)
+  mutating func enqueue(_ newElement: Element) {
+    right.append(newElement)
+  }
+  /// 从队列前端移除一个元素
+  /// 当队列为空时，返回 nil
+  /// - 复杂度: 平摊 O(1)
+  mutating func dequeue() -&gt; Element? {
+    if left.isEmpty {
+      left = right.reversed()
+      right.removeAll()
+    }
+    return left.popLast()
+  }
+}
+</code></pre></div></div>
+
+<h3 id="三遵守collection协议">三、遵守Collection协议</h3>
+<h4 id="1-文档中关于协议的最小需求">1. 文档中关于协议的最小需求</h4>
+<p>除了Index和Element以外，其他的关联类型都有默认值，大部分方法、属性和下标Collection的协议扩展也都提供了默认实现。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Collection 协议有六个关联类型，四个属性，七个实例方法
+protocol Collection: Sequence {
+  associatedtype Element // inherited from Sequence
+  associatedtype Index: Comparable
+  associatedtype IndexDistance: SignedInteger = Int
+  associatedtype Iterator: IteratorProtocol = IndexingIterator&lt;Self&gt;
+  where Iterator.Element == Element
+  associatedtype SubSequence: Sequence
+  /* ... */
+  associatedtype Indices: Sequence = DefaultIndices&lt;Self&gt;
+  /* ... */
+  var first: Element? { get }
+  var indices: Indices { get }
+  var isEmpty: Bool { get }
+  var count: IndexDistance { get }
+  func makeIterator() -&gt; Iterator
+  func prefix(through: Index) -&gt; SubSequence
+  func prefix(upTo: Index) -&gt; SubSequence
+  func suffix(from: Index) -&gt; SubSequence
+  func distance(from: Index, to: Index) -&gt; IndexDistance
+  func index(_: Index, offsetBy: IndexDistance) -&gt; Index
+  func index(_: Index, offsetBy: IndexDistance, limitedBy: Index) -&gt; Index?
+  subscript(position: Index) -&gt; Element { get }
+  subscript(bounds: Range&lt;Index&gt;) -&gt; SubSequence { get }
+}
+
+/*
+文档中关于协议的最小需求：
+……要使你的类型满足 Collection，你至少需要声明以下要求的内容：
+startIndex 和 endIndex 属性
+至少能够读取你的类型中的元素的下标方法
+至少能够读取你的类型中的元素的下标方法
+用来在集合索引之间进行步进的 index(after:) 方法。
+*/
+
+// 于是最后，我们需要实现的有：
+protocol Collection: Sequence {
+  /// 一个表示集合中位置的类型
+  associatedtype Index: Comparable
+  /// 一个非空集合中首个元素的位置
+  var startIndex: Index { get }
+  /// 集合中超过末位的位置---也就是比最后一个有效下标值大 1 的位置
+  var endIndex: Index { get }
+  /// 返回在给定索引之后的那个索引值
+  func index(after i: Index) -&gt; Index
+  /// 访问特定位置的元素
+  subscript(position: Index) -&gt; Element { get }
+}
+
+extension FIFOQueue: Collection {
+  public var startIndex: Int { return 0 }
+  public var endIndex: Int { return left.count + right.count }
+  public func index(after i: Int) -&gt; Int {
+  precondition(i &lt; endIndex)
+  return i + 1
+}
+
+public subscript(position: Int) -&gt; Element {
+  precondition((0..&lt;endIndex).contains(position), "Index out of bounds")
+  if position &lt; left.endIndex {
+    return left[left.count - position - 1]
+    } else {
+    return right[position - left.count]
+    }
+  }
+}
+
+// 有了这几行代码，我们的队列已经拥有超过 40 个方法和属性供我们使用了
+var q = FIFOQueue&lt;String&gt;()
+for x in ["1", "2", "foo", "3"] {
+  q.enqueue(x)
+}
+for s in q {
+  print(s, terminator: " ")
+} // 1 2 foo 3
+
+// 我们可以将队列传递给接受序列的方法：
+var a = Array(q) // ["1", "2", "foo", "3"]
+a.append(contentsOf: q[2...3])
+a // ["1", "2", "foo", "3", "foo", "3"]
+
+// 我们可以调用那些 Sequence 的扩展方法和属性：
+q.map { $0.uppercased() } // ["1", "2", "FOO", "3"]
+q.flatMap { Int($0) } // [1, 2, 3]
+q.filter { $0.count &gt; 1 } // ["foo"]
+q.sorted() // ["1", "2", "3", "foo"]
+q.joined(separator: " ") // 1 2 foo 3
+
+// 我们也可以调用 Collection 的扩展方法和属性：
+q.isEmpty // false
+q.count // 4
+q.first // Optional("1")
+</code></pre></div></div>
+<h4 id="2-遵守-expressiblebyarrayliteral-协议">2. 遵守 ExpressibleByArrayLiteral 协议</h4>
+<p>实现 ExpressibleByArrayLiteral，可以用 [value1, value2, etc] 语法创建一个队列。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension FIFOQueue: ExpressibleByArrayLiteral {
+  public init(arrayLiteral elements: Element...) {
+    left = elements.reversed()
+    right = []
+  }
+}
+
+let queue: FIFOQueue = [1,2,3] // FIFOQueue&lt;Int&gt;(left: [3, 2, 1], right: [])
+</code></pre></div></div>
+<ul>
+  <li>字面量
+    <ul>
+      <li>[1, 2, 3] 并不是一个数组，它只是一个“数组字面量”，是一种写法，可以用它来创建任意的遵守 ExpressibleByArrayLiteral 的类型。在这个字面量里面还包括了其他的字面量类型，比如能够创建任意遵守 ExpressibleByIntegerLiteral 的整数型字面量。</li>
+      <li>这些字面量有“默认”的类型，如果你不指明类型，那些 Swift 将假设你想要的就是默认的类型。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let byteQueue: FIFOQueue&lt;UInt8&gt; = [1,2,3]
+// FIFOQueue&lt;UInt8&gt;(left: [3, 2, 1], right: [])
+
+// 字面量的类型可以从上下文中推断出来
+// 这个函数可以接受一个从字面量创建的参数，而调用时所传递的字面量的类型，可以根据函数参数的类型被推断出来。
+func takesSetOfFloats(floats: Set&lt;Float&gt;) {
+  //...
+}
+takesSetOfFloats(floats: [1,2,3])
+// 这个字面量被推断为 Set&lt;Float&gt;，而不是 Array&lt;Int&gt;
+</code></pre></div></div>
+
+<ul>
+  <li>关联类型</li>
+  <li>IndexingIterator<Self> ，集合类型中的默认迭代器类型</Self></li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public struct IndexingIterator&lt;Elements: _IndexableBase&gt;
+: IteratorProtocol, Sequence
+{
+  internal let _elements: Elements
+  internal var _position: Elements.Index
+  init(_elements: Elements) {
+    self._elements = _elements
+    self._position = _elements.startIndex
+  }
+  public mutating func next() -&gt; Elements.Element? {
+    if _position == _elements.endIndex { return nil }
+    let element = _elements[_position]
+    _elements.formIndex(after: &amp;_position)
+    return element
+  }
+}
+// (&lt;Elements: _IndexableBase&gt; 这个泛型约束其实应该是 &lt;Elements: Collection&gt;，不过编译器还不允许循环关联类型约束。)
+</code></pre></div></div>
+<ul>
+  <li>SubSequence，从 Sequence 继承的，不过 Collection 用更严格的约束重新定义了这个类型。
+    <ul>
+      <li>一个集合类型的 SubSequence 本身也应该是一个 Collection (我们这里使用了“应该”而不是“必须”这个词，是因为现在类型系统中无法表达出这个要求)。</li>
+      <li>它的默认值是 Slice<Self>，它是对原来的集合的封装，并存储了切片相对于原来集合的起始和终止索引。</Self></li>
+      <li>集合类型经常需要对它的 SubSequence 的类型进行自定义，特别是当 SubSequence 就是 Self 时 (也就是说，一个集合的切片拥有和集合本身相同的类型)。Foundation 框架中的 Data 就是一个这种集合的例子。</li>
+    </ul>
+  </li>
+  <li>
+    <p>IndexDistance。一个有符号整数类型，代表了两个索引之间的步数，一般默认的 Int 。例外情况：在 32 位系统上访问和处理非常大 ( &gt; 4GB) 的文件，将 IndexDistance 设为 (例如) Int64。</p>
+  </li>
+  <li>Indices。集合的 indices 属性的返回值类型。它代表对于集合的所有有效下标的索引所组成的集合，并以升序进行排列。
+    <ul>
+      <li>注意并不包含 endIndex ，因为 endIndex 代表的是最后一个有效索引之后的那个索引，它不是有效的下标参数。</li>
+      <li>Indices 的默认类型是 DefaultIndices<Self>。和 Slice 一样，它是对于原来的集合类型的简单封装，并包含起始和结束索引。它需要保持对原集合的引用，这样才能够对索引进行步进。当用户在迭代索引的同时改变集合的内容的时候，可能会造成意想不到的性能问题：如果集合是以写时复制 (就像标准库中的所有集合类型所做的一样) 来实现的话，这个对于集合的额外引用将触发不必要的复制。</Self></li>
+      <li>在结构体和类中会涉及写时复制，如果在为自定义集合提供另外的 Indices 类型作为替换的话，不需要让它保持对原集合的引用，可以提升性能。这对于那些计算索引时不依赖于集合本身的集合类型都是有效的，比如数组或者队列，可以直接使用整数类型的索引。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CountableRange&lt;Index&gt;：
+extension FIFOQueue: Collection {
+  ...
+  typealias Indices = CountableRange&lt;Int&gt;
+  var indices: CountableRange&lt;Int&gt; {
+    return startIndex..&lt;endIndex
+  }
+}
+</code></pre></div></div>
+
+<h3 id="四索引">四、索引</h3>
+<p>索引表示了集合中的位置。每个集合都有两个特殊的索引值，startIndex 和 endIndex。</p>
+<ul>
+  <li>startIndex 指定集合中第一个元素，endIndex 是集合中最后一个元素之后的位置。</li>
+  <li>endIndex 并不是一个有效的下标索引，你可以用它来创建索引的范围 (someIndex..&lt;endIndex)。</li>
+  <li>或者将它与别的索引进行比较，比如来控制循环的退出条件 (while someIndex &lt; endIndex)。</li>
+  <li>到现在为止，我们都使用整数作为我们集合的索引，整数索引十分直观，但它并不是唯一选项。集合类型的 Index 的唯一要求是，它必须实现 Comparable，必须要有确定的顺序。</li>
+  <li>字典的索引是 DictionaryIndex 类型，它是一个指向字典内部存储缓冲区的不透明值，是一个Int偏移值的封装。通过索引下标访问 Dictionary 时返回的值，不像用字典键下标访问时那样是一个可选值。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Dictionary {
+  ...
+  subscript(key: Key) -&gt; Value?
+}
+
+// 通过索引访问的方法是 Collection 协议所定义的
+// (像是数组里的越界索引这样的) 无效的下标被认为是程序员犯的错误，所以它总是返回非可选值.
+// Element 类型是一个多元组：(key: Key, value: Value)
+protocol Collection {
+  subscript(position: Index) -&gt; Element { get }
+}
+</code></pre></div></div>
+<h4 id="1-索引失效">1. 索引失效</h4>
+<ul>
+  <li>当集合发生改变时，索引可能会失效
+    <ul>
+      <li>索引本身仍是有效的，但是它现在指向了一个另外的元素。</li>
+      <li>索引本身就已经无效了，通过它对集合访问将造成崩溃。</li>
+    </ul>
+  </li>
+  <li>字典的索引不会随着新的键值对的加入而失效，直到字典的尺寸增大到触发重新的内存分配。</li>
+  <li>索引应该是一个只存储包含描述元素位置所需最小信息的简单值。在尽可能的情况下，索引不应该持有对它们集合的引用。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可以用从一个数组中获取到的整数索引值来访问另一个数组的内容
+let numbers = [1,2,3,4]
+let squares = numbers.map { $0 * $0 }
+let numbersIndex = numbers.index(of: 4)! // 3
+squares[numbersIndex] // 16
+
+// 使用一个字符串的 startIndex 来访问另一个字符串的首字符
+// 用这个索引来通过下标访问一个空字符串的话，程序将因为索引越界而发生崩溃
+let hello = "Hello"
+let world = "World"
+let helloIdx = hello.startIndex
+world[helloIdx] // W
+</code></pre></div></div>
+<ul>
+  <li>在集合之间共享索引是有其合理用法的，在切片上我们会大量使用这种方式。Collection 协议要求原集合的索引必须在切片上也命中同样的元素，在切片之间共享索引将会是安全的操作。</li>
+</ul>
+
+<h4 id="2-索引步进">2. 索引步进</h4>
+<p>向前或者向后移动索引的任务是由集合来负责的，collection.index(after: someIndex)。</p>
+
+<h4 id="3-自定义集合索引">3. 自定义集合索引</h4>
+<p>分割字符串中的单词，采用延迟加载的方式进行迭代，不一次性地计算出所有单词。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将使用提供的分割元素进行分割，把一个集合转变为其 SubSequence 的数组
+// 每个单词的类型都是 SubString，这正是 String 所关联的 SubSequence 类型
+var str = "Still I see monsters"
+str.split(separator: " ") // ["Still", "I", "see", "monsters"]
+
+// start 是所有前置空格都被移除了的子字符串。寻找下一个空格，以它作为单词的结束边界，找不到则使用 endIndex。
+extension Substring {
+  var nextWordRange: Range&lt;Index&gt; {
+    let start = drop(while: { $0 == " "})
+    let end = start.index(where: { $0 == " "}) ?? endIndex
+    return start.startIndex..&lt;end
+  }
+}
+
+// 集合类型的索引需要满足 Comparable (因为 Comparable 继承自 Equatable，所以我们还需要实现 ==)
+struct WordsIndex: Comparable {
+  fileprivate let range: Range&lt;Substring.Index&gt;
+  fileprivate init(_ value: Range&lt;Substring.Index&gt;) {
+    self.range = value
+  }
+  static func &lt;(lhs: Words.Index, rhs: Words.Index) -&gt; Bool {
+    return lhs.range.lowerBound &lt; rhs.range.lowerBound
+  }
+  static func ==(lhs: Words.Index, rhs: Words.Index) -&gt; Bool {
+    return lhs.range == rhs.range
+  }
+}
+
+// 满足Collection 协议要求 startIndex 的复杂度为 O(1)
+struct Words: Collection {
+  let string: Substring
+  let startIndex: WordsIndex
+  init(_ s: String) {
+    self.init(s[...])
+  }
+  private init(_ s: Substring) {
+    self.string = s
+    self.startIndex = WordsIndex(string.nextWordRange)
+  }
+  var endIndex: WordsIndex {
+    let e = string.endIndex
+    return WordsIndex(e..&lt;e)
+  }
+}
+
+// 下标的实现满足 O(1) 复杂度
+extension Words {
+  subscript(index: WordsIndex) -&gt; Substring {
+    return string[index.range]
+  }
+}
+
+// 在给定某个某个索引时，能够计算出下一个索引
+extension Words {
+  func index(after i: WordsIndex) -&gt; WordsIndex {
+    guard i.range.upperBound &lt; string.endIndex
+    else { return endIndex }
+    let remainder = string[i.range.upperBound...]
+    return WordsIndex(remainder.nextWordRange)
+  }
+}
+Array(Words(" hello world test ").prefix(2)) // ["hello", "world"]
+</code></pre></div></div>
+<ul>
+  <li>我们可以对单词的边界进行设置：相对于现在直接使用空格，我们可以传入一个 isWordBoundary: (Character) -&gt; Bool 的函数来确定单词边界。</li>
+  <li>这些代码并不是指针对字符串的：我们完全可以将 String 替换成任意的集合类型。比如，我们可以用同样的算法来将 Data 延迟分割为可处理的小数据块。</li>
+</ul>
+
+<h3 id="五切片">五、切片</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//  list.dropFirst():
+let words: Words = Words("one two three")
+let onePastStart = words.index(after: words.startIndex)
+
+let firstDropped = words[onePastStart..&lt;words.endIndex]
+Array(firstDropped) // ["two", "three"]
+
+let firstDropped2 = words.suffix(from: onePastStart)
+let firstDropped3 = words[onePastStart...]
+
+// 默认情况下，firstDropped 不是 Words，它的类型是 Slice&lt;Words&gt;
+// Slice 是基于任意集合类型的一个轻量级封装、它的实现看上去会是这样的
+struct Slice&lt;Base: Collection&gt;: Collection {
+  typealias Index = Base.Index
+  typealias IndexDistance = Base.IndexDistance
+  typealias SubSequence = Slice&lt;Base&gt;
+  let collection: Base
+  var startIndex: Index
+  var endIndex: Index
+  init(base: Base, bounds: Range&lt;Index&gt;) {
+    collection = base
+    startIndex = bounds.lowerBound
+    endIndex = bounds.upperBound
+  }
+  func index(after i: Index) -&gt; Index {
+    return collection.index(after: i)
+  }
+  subscript(position: Index) -&gt; Base.Element {
+    return collection[position]
+  }
+  subscript(bounds: Range&lt;Base.Index&gt;) -&gt; Slice&lt;Base&gt; {
+    return Slice(base: collection, bounds: bounds)
+  }
+}
+
+// Slice非常适合作为默认的子序列类型，需要考虑集合类型本身能够当作自己的SubSequence使用
+// Words比较容易。编译器根据范围下标访问的返回类型，推断出SubSequence类型。
+extension Words {
+  subscript(range: Range&lt;WordsIndex&gt;) -&gt; Words {
+    let start = range.lowerBound.range.lowerBound
+    let end = range.upperBound.range.upperBound
+    return Words(string[start..&lt;end])
+  }
+}
+</code></pre></div></div>
+<ul>
+  <li>将集合类型的 SubSequence 定义为和集合类型相同的类型，可以减轻集合类型使用者的负担，因为他们只需要理解单个类型就可以了，而不需要学习两个类型。</li>
+  <li>让“根”集合类型和切片使用不同的类型，有助于避免意外的内存“泄漏”，这也是标准库中使用 ArraySlice 和 Substring 来作为 Array 和 String 的子序列的原因。</li>
+</ul>
+
+<h4 id="1-切片与原集合共享索引">1. 切片与原集合共享索引</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let cities = ["New York", "Rio", "London", "Berlin",
+"Rome", "Beijing", "Tokyo", "Sydney"]
+let slice = cities[2...4]
+cities.startIndex // 0
+cities.endIndex // 8
+slice.startIndex // 2
+slice.endIndex // 5
+</code></pre></div></div>
+<ul>
+  <li>如果不小心访问了 slice[0]，你的程序将会崩溃，一定要从 collection.startIndex 开始进行循环，而不要把 0 作为开始。尽可能始终选择 for x in collection 的形式，而不去手动地用 for index in collection.indices 进行索引计算。如果你在通过集合类型的 indices 进行迭代时，修改了集合的内容，那么 indices 所持有的任何对原来集合类型的强引用都会破坏写时复制的性能优化，因为这会造成不必要的复制操作。如果集合的尺寸很大的话，这会对性能造成很大的影响。(不是所有集合的 Indices 类型都持有对原集合的强引用，不过因为标准库中的 DefaultIndices 是这么做的，所以很多集合都有同样的行为。)</li>
+  <li>可以将 for 循环替换为 while 循环，然后手动在每次迭代的时候增加索引值，这样你就不会用到 indices 属性。</li>
+</ul>
+
+<h4 id="2-泛型-prefixiterator">2. 泛型 PrefixIterator</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct PrefixIterator&lt;Base: Collection&gt;: IteratorProtocol, Sequence {
+  let base: Base
+  var offset: Base.Index
+  init(_ base: Base) {
+    self.base = base
+    self.offset = base.startIndex
+  }
+  mutating func next() -&gt; Base.SubSequence? {
+    guard offset != base.endIndex else { return nil }
+    base.formIndex(after: &amp;offset)
+    return base.prefix(upTo: offset)
+  }
+}
+
+// 通过使迭代器直接满足 Sequence，我们可以直接对它使用序列的那些函数，而不用另外定义类型
+let numbers = [1,2,3]
+Array(PrefixIterator(numbers))
+// [ArraySlice([1]), ArraySlice([1, 2]), ArraySlice([1, 2, 3])]
+</code></pre></div></div>
+<h3 id="六专门的集合类型">六、专门的集合类型</h3>
+<p>Collection 努力将它的需求控制在最小，协议本身应该只要求和功能相关所绝对必须的内容，满足该协议的类型可以不需要提供那些非相关功能。</p>
+<ul>
+  <li>BidirectionalCollection — “一个既支持前向又支持后向遍历的集合。</li>
+  <li>RandomAccessCollection — “一个支持高效随机存取索引遍历的集合。</li>
+  <li>MutableCollection — “一个支持下标赋值的集合。</li>
+  <li>RangeReplaceableCollection — “一个支持将任意子范围的元素用别的集合中的元素进行替换的集合。</li>
+</ul>
+
+<h4 id="1-双向索引">1. 双向索引</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension BidirectionalCollection {
+  /// 集合中的最后一个元素。
+  /// Collection 本身也能提供 last 属性，从头迭代到尾，O(n) 操作
+  public var last: Element? {
+    return isEmpty ? nil : self[index(before: endIndex)]
+  }
+}
+
+extension BidirectionalCollection {
+  /// 返回集合中元素的逆序表示方式似乎数组
+  /// - 复杂度: O(1)
+  public func reversed() -&gt; ReversedCollection&lt;Self&gt; {
+    return ReversedCollection(_base: self)
+  }
+}
+</code></pre></div></div>
+<ul>
+  <li>BidirectionalCollection 在前向索引的基础上只增加了一个方法，但是它非常关键，那就是获取上一个索引值的 index(before:)。</li>
+  <li>和上面 Sequence 的 enumerated 封装一样，它不会真的去将元素做逆序操作。ReverseCollection 会持有原来的集合，并且使用逆向的索引。依赖了值语义的特性，封装将原集合“复制”到它自己的存储中。</li>
+  <li>Dictionary 和 Set 是无序的集合类型，讨论前向迭代还是后向迭代没有意义。</li>
+</ul>
+
+<h4 id="2-随机存取的集合类型">2. 随机存取的集合类型</h4>
+<p>RandomAccessCollection 提供了最高效的元素存取方式，它能够在常数时间内跳转到任意索引。</p>
+<ul>
+  <li>满足该协议的类型必须能够 (a) 以任意距离移动一个索引，以及 (b) 测量任意两个索引之间的距离，两者都需要是 O(1) 时间常数的操作。</li>
+  <li>RandomAccessCollection 以更严格的约束重新声明了关联的 Indices 和 SubSequence 类型，这两个类型自身也必须是可以进行随机存取的。</li>
+  <li>满足协议的类型必须确保满足文档所要求的 O(1) 复杂度，可以通过提供 index(_:offsetBy:) 和 distance(from:to:) 方法，或者是使用一个满足 Strideable 的 Index 类型 (像是 Int)。</li>
+  <li>对于 Collection 和 BidirectionalCollection，index(_:offsetBy:) 操作通过渐进的方式访问下一个索引，直到到达目标索引为止。这显然是一个线性复杂度的操作，随着距离的增加，完成操作需要消耗的时间也线性增长。而随机存取索引则完全不同，它可以直接在两个索引间进行移动。</li>
+</ul>
+
+<h4 id="3-mutablecollection">3. MutableCollection</h4>
+<p>可变集合支持原地的元素更改。相比于 Collection，MutableCollection 只增加了，单个元素的下标访问方法 subscript 必须提供一个 setter。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension FIFOQueue: MutableCollection {
+  public var startIndex: Int { return 0 }
+  public var endIndex: Int { return left.count + right.count }
+  public func index(after i: Int) -&gt; Int {
+    return i + 1
+  }
+  public subscript(position: Int) -&gt; Element {
+    get {
+      precondition((0..&lt;endIndex).contains(position), "Index out of bounds")
+      if position &lt; left.endIndex {
+        return left[left.count - position - 1]
+      } else {
+        return right[position - left.count]
+      }
+    }
+    set {
+      precondition((0..&lt;endIndex).contains(position), "Index out of bounds")
+      if position &lt; left.endIndex {
+        left[left.count - position - 1] = newValue
+      } else {
+        return right[position - left.count] = newValue
+      }
+    }
+  }
+}
+
+var playlist: FIFOQueue = ["Shake It Off", "Blank Space", "Style"]
+playlist.first // Optional("Shake It Off")
+playlist[0] = "You Belong With Me"
+playlist.first // Optional("You Belong With Me")
+</code></pre></div></div>
+<ul>
+  <li>编译器不让为存在的Collection添加setter，必须拓展新方法满足MutableCollection。(a)不允许只提供setter不提供geter，(b)无法重新定义已存在的getter。</li>
+  <li>MutableCollection 允许改变集合中的元素值，但是它不允许改变集合的长度或者元素的顺序。</li>
+  <li>字典和集合是无序的结合类型，indices元素变化时，存储位置也会改变，不满足索引保持不变的条件。</li>
+</ul>
+
+<h4 id="4-rangereplaceablecollection">4. RangeReplaceableCollection</h4>
+<ul>
+  <li>协议提供对于需要添加或者移除元素的操作，两个要求：
+    <ul>
+      <li>一个空的初始化方法 — 在泛型函数中这很有用，因为它允许一个函数创建相同类型的新的空集合。</li>
+      <li>replaceSubrange(_:with:) 方法 — 它接受一个要替换的范围以及一个用来进行替换的集合。</li>
+    </ul>
+  </li>
+  <li>只需要实现一个超级灵活的 replaceSubrange 方法，协议扩展就可以为你引申出一系列有用的方法。
+    <ul>
+      <li>append(_:) 和 append(contentsOf:) — 将 endIndex..&lt;endIndex (也就是说末尾的空范围) 替换为单个或多个新的元素。</li>
+      <li>remove(at:) 和 removeSubrange(_:) — 将 i…i 或者 subrange 替换为空集合。</li>
+      <li>insert(at:) 和 insert(contentsOf:at:) — 将 i..&lt;i (或者说在数组中某个位置的空范围) 替换为单个或多个新的元素。</li>
+      <li>removeAll — 将 startIndex..&lt;endIndex 替换为空集合。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 将这些元素再做一次逆序，然后合并到右侧的数组中，一次性地对整个范围进行替换
+extension FIFOQueue: RangeReplaceableCollection {
+  mutating func replaceSubrange&lt;C: Collection&gt;(_ subrange: Range&lt;Int&gt;,
+  with newElements: C) where C.Element == Element
+  {
+    right = left.reversed() + right
+    left.removeAll()
+    right.replaceSubrange(subrange, with: newElements)
+  }
+}
+</code></pre></div></div>
+<h4 id="5-组合能力">5. 组合能力</h4>
+<p>这些专门的集合协议可以被很好地组合起来，作为一组约束，来匹配每个特定算法的要求。</p>
+
+<p>举例来说，标准库中有个 sort 方法，可以原地对一个集合进行排序 (而不像它的不可变版本 sorted 那样，返回一个排序后的数组)。</p>
+<ul>
+  <li>原地排序需要集合是可变的，如果你想要排序保持迅速，你还需要随机存取。最后，当然你还需要能够比较集合中元素的大小。</li>
+  <li>将这些要求组合起来，sort 方法被定义在了 MutableCollection 上，并包括 RandomAccessCollection 和 Element: Comparable 作为附加的约束：</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension MutableCollection
+  where Self: RandomAccessCollection, Element: Comparable {
+  /// 原地对集合进行排序
+  public mutating func sort() { ... }
+}
+</code></pre></div></div>
+:ET

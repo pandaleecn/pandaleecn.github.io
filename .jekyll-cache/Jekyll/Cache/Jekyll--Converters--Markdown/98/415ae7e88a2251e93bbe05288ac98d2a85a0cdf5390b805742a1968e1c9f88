@@ -1,0 +1,7 @@
+I"�<h3 id="一透明代理的实现原理">一、透明代理的实现原理</h3>
+<p>透明代理的意思是客户端根本不需要知道有代理服务器的存在，它改变你的request fields（报文），并会传送真实IP，多用于路由器的NAT转发中。注意，加密的透明代理则是属于匿名代理，意思是不用设置使用代理了。</p>
+<h4 id="1-代理结构">1. 代理结构</h4>
+<p><img src="http://files.pandaleo.cn/de025760c2a0cb8ad31b57e1b27806fb.png" alt="" /></p>
+<h4 id="2-内部原理">2. 内部原理</h4>
+<p><img src="http://files.pandaleo.cn/120eed1cfd39ea48dc0e9dde7b312526.png" alt="" /></p>
+:ET

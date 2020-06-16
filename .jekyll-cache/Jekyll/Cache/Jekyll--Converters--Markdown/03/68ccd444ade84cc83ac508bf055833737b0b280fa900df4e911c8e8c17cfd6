@@ -1,0 +1,8 @@
+I"�<h4 id="一nssetnsarraynsdictionary的区别">一、NSSet\NSArray\NSDictionary的区别</h4>
+<ul>
+  <li>NSSet和NSArray都是对象容器，用于存储对象，属于集合； NSSet ， NSMutableSet是无序的集合，在内存中存储方式是不连续的，NSArray是有序的集合，在内存中存储位置是连续的；</li>
+  <li>NSSet和NSArray区别是：在搜索一个一个元素时NSSet比NSArray效率高，主要是它用到了一个算法hash；开发文档中这样解释：You can use sets as an alternative to arrays when the order of elements isn’t important and performance in testing whether an object is contained in the set is a consideration—while arrays are ordered, testing for membership is slower than with sets.比如你要存储元素A，一个hash算法直接就能直接找到A应该存储的位置；同样，当你要访问A时，一个hash过程就能找到A存储的位置。而对于NSArray，若想知道A到底在不在数组中，则需要便利整个数组，显然效率较低了；</li>
+  <li>NSSet，NSArray都是类，只能添加cocoa对象，如果需要加入基本数据类型（int，float，BOOL，double等），需要将数据封装成NSNumber类型。</li>
+  <li>NSSet与NSDictionary的区别，当有重复的key插入到字典NSDictionary时，会覆盖旧值，而集合NSSet则什么都不做，保证了里面的元素不会重复。</li>
+</ul>
+:ET

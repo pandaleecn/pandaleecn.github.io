@@ -1,0 +1,8 @@
+I"�<h3 id="一代理delegate">一、代理(Delegate)</h3>
+<h4 id="1-定义">1. 定义</h4>
+<ul>
+  <li>准确的说是一种软件设计模式</li>
+  <li>iOS当中以@protocol形式体现</li>
+  <li>传递方式一对一</li>
+</ul>
+:ET

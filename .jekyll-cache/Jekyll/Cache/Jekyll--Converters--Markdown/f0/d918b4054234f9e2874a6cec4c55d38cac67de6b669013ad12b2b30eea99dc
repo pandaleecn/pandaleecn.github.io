@@ -1,0 +1,5 @@
+I"<h4 id="1-obj-foo和objc_msgsend函数之间有什么关系">1. [obj foo]和objc_msgSend()函数之间有什么关系？</h4>
+<ul>
+  <li>在编译器处理后变成了objc_msgSend调用，第一个参数是obj，第二个参数是foo，开始runtime消息传递过程。</li>
+</ul>
+:ET

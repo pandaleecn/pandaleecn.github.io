@@ -1,0 +1,54 @@
+I"x	<p><img src="http://files.pandaleo.cn/59c9137b015b29ddddce8b640d0e0409.png" alt="" /></p>
+<h3 id="一-基本结构">一、 基本结构</h3>
+<h4 id="1-objc_object">1. objc_object</h4>
+<p><img src="http://files.pandaleo.cn/64ef82250c0a871da6e7d19c8bdba99e.png" alt="" /></p>
+<h4 id="2-objc_class">2. objc_class</h4>
+<p><img src="http://files.pandaleo.cn/e4c6bf58c87027edc6d9ab2e23af034e.png" alt="" /></p>
+<h4 id="3-isa_t">3. isa_t</h4>
+<ul>
+  <li>共用体isa_t
+<img src="http://files.pandaleo.cn/55bf0c4bcad19f93be70d1d664462c93.png" alt="" /></li>
+  <li>isa指向
+    <ul>
+      <li>关于对象，其指向类对象
+<img src="http://files.pandaleo.cn/0c8dfb3c8a7c61d3d6aba903fa3e6bd0.png" alt="" /></li>
+      <li>关于类对象，其指向原类对象
+<img src="http://files.pandaleo.cn/fc3082353c3e5bb6b57f6d54ab179e48.png" alt="" /></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="4-cache_t">4. cache_t</h4>
+<ul>
+  <li>用于快速查找方法执行函数</li>
+  <li>是可增量扩展的哈希表结构</li>
+  <li>是局部性原理的最佳应用。局部性原理：在调用方法时，将频次高的方法放入缓存中，可以提高命中率。
+<img src="http://files.pandaleo.cn/df3c046872779581fc7ba273ccd06b34.png" alt="" /></li>
+</ul>
+
+<h4 id="5-class_data_bits_t">5. class_data_bits_t</h4>
+<ul>
+  <li>class_data_bits_t主要是对class_rw_t的封装</li>
+  <li>class_rw_t代表了类相关的读写信息、对class_ro_t的封装</li>
+  <li>class_ro_t代表了类相关的只读信息</li>
+</ul>
+
+<h4 id="6-class_rw_t">6. class_rw_t</h4>
+<p><img src="http://files.pandaleo.cn/30741ec9e2c071248b7219c74962d1bb.png" alt="" />
+ methods：分类中的协议、属性方法</p>
+<h4 id="7-class_ro_t">7. class_ro_t</h4>
+<p><img src="http://files.pandaleo.cn/1fe37fcd7ef773afb5b3cf7ce1f254a3.png" alt="" />
+methodList：原始协议、属性、方法</p>
+<h4 id="8-method_t">8. method_t</h4>
+<p><img src="http://files.pandaleo.cn/0940fd094bb00fb5fbc4121a1ae2e379.png" alt="" /></p>
+<h4 id="9-type-encodings">9. Type Encodings</h4>
+<ul>
+  <li>const char* types;
+<img src="http://files.pandaleo.cn/348a3342b007799a4be4469ed33044a0.png" alt="" />
+id: 对象，接收者，SEL: @selector(方法名)<br />
+<a href="http://developer.apple.com">更多关于Type Encodings</a></li>
+</ul>
+
+<h3 id="二整体结构">二、整体结构</h3>
+<p><img src="http://files.pandaleo.cn/be8e532f0de0cade7d075c42ce99e9d1.png" alt="" /></p>
+:ET

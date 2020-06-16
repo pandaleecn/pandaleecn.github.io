@@ -1,0 +1,25 @@
+I";<h3 id="一-http超文本传输协议">一、 HTTP，超文本传输协议</h3>
+<h4 id="1-请求响应报文">1. 请求/响应报文</h4>
+<ul>
+  <li>请求报文
+<img src="http://files.pandaleo.cn/0eca23c66636aed2bcac6ff4008a5aae.png?imageMogr2/thumbnail/!68p" alt="" />
+    <ul>
+      <li>方法
+        <ul>
+          <li>日常：GET、POST
+            <ul>
+              <li>GET和POST区别？普通总结。
+                <ul>
+                  <li>GET请求参数以？分割拼接到URL后面，POST请求参数在Body里面</li>
+                  <li>GET参数长度限制2048个字符，POST一般没有该限制</li>
+                  <li>GET请求不安全，POST请求比较安全</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+:ET

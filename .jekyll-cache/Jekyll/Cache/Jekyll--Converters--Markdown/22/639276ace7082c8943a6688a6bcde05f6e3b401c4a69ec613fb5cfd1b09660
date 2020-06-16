@@ -1,0 +1,216 @@
+I"�"<p>使用框架的目的是实现：模块化、分层、解耦、降低代码重合度</p>
+
+<h4 id="1-图片缓存">1. 图片缓存</h4>
+<ul>
+  <li>怎样设计一个图片缓存框架？
+<img src="http://files.pandaleo.cn/25ec8fec6e61e12ec21d1233dcc0f9d7.png?imageMogr2/thumbnail/!50p" alt="" />
+    <ul>
+      <li>Manager，管理者，调度框架内部各个模块</li>
+      <li>内存缓存模块，模拟计算机组成原理多级缓存思想</li>
+      <li>磁盘缓存模块</li>
+      <li>网络下载图片</li>
+      <li>Code Manager，解码管理者
+        <ul>
+          <li>图片解码</li>
+          <li>图片压缩/解压缩</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>图片通过什么方式进行读写，过程是怎样的？</p>
+
+    <ul>
+      <li>以图片URL的单项Hash值作为Key
+<img src="http://files.pandaleo.cn/337f61757b32210bd3ded432d4c37c49.png?imageMogr2/thumbnail/!50p" alt="" /></li>
+    </ul>
+  </li>
+  <li>内存的设计上需要考虑哪些问题？
+    <ul>
+      <li>存储的Size
+<img src="http://files.pandaleo.cn/f62d8bea79809d2e5b5275349320f913.png?imageMogr2/thumbnail/!50p" alt="" />
+        <ul>
+          <li>10kb以下图片使用频率最高，在内存空间上开辟50个10kb以下的空间缓存对应图片，获取10kb以下图片在内存中占据的容量大小。</li>
+          <li>100kb以下图片使用频率少，开辟20个100kb的存储空间。</li>
+          <li>100kb以上图片使用频率较少，开辟10个容量大小的存储空间。</li>
+          <li>原则：考虑图片大小本身与不同图片大小使用频率，分别设计存储容量的大小。</li>
+          <li>通过队列的方式存储图片，先进先出</li>
+        </ul>
+      </li>
+      <li>
+        <p>淘汰策略</p>
+
+        <ul>
+          <li>以队列先进先出的方式淘汰
+<img src="http://files.pandaleo.cn/c0b16c0285539d0679c6a000af16678d.png?imageMogr2/thumbnail/!50p" alt="" /></li>
+          <li>LRU算法（如30分钟之内是否使用过），最近最久未使用算法
+<img src="http://files.pandaleo.cn/f21835151f1d83ea29e386a14da1d6f0.png?imageMogr2/thumbnail/!50p" alt="" />
+在定时检查的基础上，提高检查触发频率，在每次读写和前后台切换时，检查图片使用时间是否超时，使用过程要注意开销。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>磁盘设计需要考虑哪些问题？
+    <ul>
+      <li>存储方式</li>
+      <li>大小限制（如100MB）</li>
+      <li>淘汰策略（如某一图片存储时间距今已超过7天）</li>
+    </ul>
+  </li>
+  <li>网络部分的设计需要考虑哪些问题？
+    <ul>
+      <li>图片请求最大并发量</li>
+      <li>请求超时策略。如：再次请求，如果失败放弃。</li>
+      <li>请求优先级。</li>
+    </ul>
+  </li>
+  <li>图片解码
+    <ul>
+      <li>对于不同格式的图片，解码采用什么方式来做？
+        <ul>
+          <li>应用策略模式对不同格式进行解码</li>
+        </ul>
+      </li>
+      <li>在哪个阶段做图片解码处理？
+        <ul>
+          <li>磁盘读取后</li>
+          <li>网络请求返回后</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>线程处理时序图
+<img src="http://files.pandaleo.cn/1d32b28c9fa966def524d356ee8f08dc.png?imageMogr2/thumbnail/!50p" alt="" /></li>
+</ul>
+
+<h4 id="2-阅读时长统计">2. 阅读时长统计</h4>
+<ul>
+  <li>怎样设计一个时长统计框架？
+<img src="http://files.pandaleo.cn/4fc11d1a01e14397db3c248a1069475f.png?imageMogr2/thumbnail/!50p" alt="" />
+    <ul>
+      <li>记录器，负责对每一条时长统计的数据记录
+        <ul>
+          <li>页面式，记录用户访问页面时长，从页面Push开始作为阅读时长的开始节点，Pop代表结束。</li>
+          <li>流式，浏览微博Feed流、腾讯新闻、头条新闻流媒体阅读时长记录。</li>
+          <li>自定义式，如横滑式场景。</li>
+        </ul>
+      </li>
+      <li>记录管理者，管理记录器记录的数据。
+        <ul>
+          <li>记录缓存</li>
+          <li>磁盘存储，维护处理异常场景，导致内存缓存丢失的问题</li>
+          <li>上传器，将本地记录的时长上传到Server</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>为何要有不同类型的记录器，你的考虑是什么？
+    <ul>
+      <li>基于不同分类场景提供的关于记录的封装、适配。</li>
+    </ul>
+  </li>
+  <li>记录的数据会由于某种原因丢失，你是怎样处理的？（降低丢失率）
+    <ul>
+      <li>定时写磁盘</li>
+      <li>限定内存缓存条数（如10条），超过该条数，即写磁盘</li>
+    </ul>
+  </li>
+  <li>记录上传器
+    <ul>
+      <li>关于延时上传的具体场景有哪些？
+        <ul>
+          <li>前后台切换</li>
+          <li>从无网到有网的变法</li>
+          <li>通用轻量接口捎带（存在耦合）</li>
+        </ul>
+      </li>
+      <li>上传时机是怎样把控的？
+        <ul>
+          <li>立刻上传</li>
+          <li>延时上传</li>
+          <li>定时上传</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="3-复杂页面架构">3. 复杂页面架构</h4>
+<ul>
+  <li>MVVM框架思想
+<img src="http://files.pandaleo.cn/23573bdc9793c685e878a22128e96bd9.png?imageMogr2/thumbnail/!50p" alt="" />
+    <ul>
+      <li>Model，数据层。通过block或代理，回传到ViewModel层。</li>
+      <li>View，视图层。包含View层和ViewController层，对ViewModel强引用。</li>
+      <li>ViewModel，业务逻辑层，对Model强引用。通过Block方式，将输出结果回传给使用方，或通过RAC函数响应式编程回传。</li>
+    </ul>
+  </li>
+  <li>ReactNative的数据流思想
+<img src="http://files.pandaleo.cn/efe05152b945cb0a83f63d42fddefadb.png?imageMogr2/thumbnail/!50p" alt="" />
+    <ul>
+      <li>视图上添加的所有视图，组成一颗多叉树，子视图包含子视图</li>
+      <li>对某个叶子节点UIView数据更新，导致UI变化时，通过多叉树，反向回到根节点。由根节点自顶向下判定，哪个节点需要更新。如：找到某包含脏标记需要更新的节点，更新对应的UI视图。</li>
+      <li>总结：任何子孙节点没有权利做自己的变化更新，必须传递到根节点，由根节点自顶向下询问需要更新的节点。由主动行为变为被动行为。</li>
+    </ul>
+  </li>
+  <li>系统UIView更新机制的思想</li>
+  <li>FaceBook的开源框架AsyncDisplayKit关于预排版的设计思想</li>
+</ul>
+
+<h4 id="4-客户端整体架构">4. 客户端整体架构</h4>
+<p><img src="http://files.pandaleo.cn/1d6f74f5c29d65b056f52a6089cc7a48.png?imageMogr2/thumbnail/!50p" alt="" /></p>
+<ul>
+  <li>通用层：时长统计、崩溃统计、网络第三方库，独立于当前App，可用于任何其他App。</li>
+  <li>通用业务层
+    <ul>
+      <li>通用基础组件，如：公司内通用基础组件，自定义控件、特殊UIImageView封装，各个业务线都有的业务控件。</li>
+    </ul>
+  </li>
+  <li>中间层：实现业务层的协调和解耦</li>
+  <li>业务层：可以独立生成App。</li>
+  <li>业务之间的解耦通信方式
+    <ul>
+      <li>OpenURL</li>
+      <li>依赖注入
+<img src="http://files.pandaleo.cn/584309487e51f8c37d27f7f237dda25c.png?imageMogr2/thumbnail/!50p" alt="" />
+        <ul>
+          <li>业务层不要对业务C产生依赖</li>
+          <li>业务C通过注入的方式，注入到中间层</li>
+          <li>业务A到中间层获取业务C注入的依赖</li>
+          <li>通过中间层的设计和依赖注入的方式，接触业务A和业务C之间的耦合。
+            <ul>
+              <li>如：业务C注册Protocol到中间层，实现代理方法，返回给中间层具体实例对象。</li>
+              <li>业务A使用时，实现和业务C商定协议，从中间层根据某一方法，获取遵从某一协议的实例，在业务A中将实例作为遵从协议的透明对象使用。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="5-总结">5. 总结</h4>
+<ul>
+  <li>图片缓存
+    <ul>
+      <li>整体缓存框架的设计、内存/磁盘/网络需要考虑的问题</li>
+    </ul>
+  </li>
+  <li>阅读时长统计
+    <ul>
+      <li>框架结构、时长统计数据丢失率</li>
+    </ul>
+  </li>
+  <li>复杂页面架构
+    <ul>
+      <li>微博正文整体架构设计，MVVM框架思想、RN数据流思想、UIView绘制原理思想、FB设计预排版思想。</li>
+    </ul>
+  </li>
+  <li>客户端整体架构分层
+    <ul>
+      <li>原则：上层可以依赖下层，下层不能依赖上层。</li>
+      <li>解耦方式：OpenURL、依赖注入</li>
+    </ul>
+  </li>
+</ul>
+:ET
