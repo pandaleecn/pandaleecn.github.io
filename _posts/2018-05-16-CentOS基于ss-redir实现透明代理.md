@@ -9,7 +9,7 @@ tags: CentOS
 
 ### 一、透明代理的实现原理
 透明代理的意思是客户端根本不需要知道有代理服务器的存在，它改变你的request fields（报文），并会传送真实IP，多用于路由器的NAT转发中。注意，加密的透明代理则是属于匿名代理，意思是不用设置使用代理了。
-#### 1. 代理结构1
+#### 1. 代理结构
 ![](http://files.pandaleo.cn/de025760c2a0cb8ad31b57e1b27806fb.png)
 #### 2. 内部原理
 ![](http://files.pandaleo.cn/120eed1cfd39ea48dc0e9dde7b312526.png)
