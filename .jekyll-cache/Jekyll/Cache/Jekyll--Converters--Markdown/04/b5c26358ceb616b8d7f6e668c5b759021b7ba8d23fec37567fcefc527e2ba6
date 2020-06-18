@@ -1,8 +1,8 @@
-I"�<h4 id="1-给分类添加成员变量">1. 给分类添加”成员变量”</h4>
+I"�<h4 id="1-给分类添加成员变量">1. 给分类添加”成员变量”</h4>
 <p>不能直接添加成员变量，可以用关联对象的方法为分类添加。</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>id objc_getAssociatedObject(id object, const void *key)
 
-// policy：关联方法，copy、retai
+// policy：关联方法，copy、retain
 void objc_setAssociatedObject(id object, const void *key, id value, objc_AssociationPolicy policy)
 
 void objc_removeAssociatedObject(id object)
