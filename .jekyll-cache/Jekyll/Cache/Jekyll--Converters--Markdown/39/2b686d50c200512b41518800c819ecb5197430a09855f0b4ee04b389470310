@@ -1,4 +1,4 @@
-I"Z<h4 id="1app运行过程中同时最多有几个线程如何实现的高并发">1.App运行过程中，同时最多有几个线程，如何实现的高并发</h4>
+I"�`<h4 id="1app运行过程中同时最多有几个线程如何实现的高并发">1.App运行过程中，同时最多有几个线程，如何实现的高并发</h4>
 <ul>
   <li>最多有几个线程： 根据cpu的能力，目测：50个，限制活动线程的个数不超过硬件线程的个数。</li>
   <li>Blocked状态的线程个数不在限制内，区分计算密集型和IO密集型线程，计算密集型大部分时间保证runnable状态，IO密集型线程不需要太多；</li>
@@ -218,6 +218,41 @@ content\opacity\ContentsRect.size.width</p>
   <li>熟悉 App 内存占用、耗电、网络、UI 渲染等性能方面分析和优化的方法</li>
 </ul>
 
+<h4 id="5关键技能">5、关键技能</h4>
+<pre>
+精通OC语言，对runtime运行时机制原理有比较深入的了解
+
+熟悉相关热门框架的封装以及原理：YYCache缓存机制，YYImage图片原理，YYWebImage/SDWebImage底层原理,YYAsyncLayer异步绘制，美团开源框架Graver框架的底层原理，并能调优性能
+
+熟悉Alamofire,针对公司网络特质封装过网络相关框架
+
+HTTP/HTTPS、TCP/IP通信协议，安全网络都有一定掌握
+
+熟悉RxSwift函数响应式编程原理，构建过项目响应式组件，对网络、UI、常规逻辑设计独立的组件
+
+熟悉性能调优，内存管理，崩溃处理、卡顿检测、性能优化，Instruments，Analyze以及一些常用的三方性能检测工具。
+
+熟悉多线程开发，对线程安全，GCD底层原理多有比较深入的掌握
+
+熟悉MVP面向协议编程架构设计，通过适配器原则，中间者模式等等设计模式优化项目
+
+熟悉组件化设计开发，能够通过路由设计，cocoapods组件解耦通讯
+
+熟练FMDB数据库编程、对WCDB事务机制以及数据库迁移有一定的了解
+
+熟练掌握逆向开发(应用砸壳、重签名、hook、Cycript、Logos、动态调试/静态调试)
+
+熟练掌握项目的安全防护(ptrace 反调试、sysctl 防护 )
+
+熟悉shell脚本、fastlane以及Jenkins等等方式对项目持续集成&amp;自动打包分发的能力
+
+具备一定的设计与架构能力，并能结合项目定制化敏捷开发
+
+具备快速源码阅读、分析能力，平时都有参与相关框架贡献
+
+具有一定的英文阅读能力，平时都有参与github以及一些热门框架论坛社区交流
+</pre>
+
 <h4 id="腾讯一面经">腾讯一面经</h4>
 <ul>
   <li>应用大于原理，日常多搜集积累应用细节，尽量针对部门尽量全面覆盖知识点；</li>
@@ -225,8 +260,7 @@ content\opacity\ContentsRect.size.width</p>
 </ul>
 
 <ol>
-  <li>对OAuth的理解；<br />
-https://www.jianshu.com/p/a047176d9d65?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=seo_notes&amp;utm_source=recommendation</li>
+  <li><a href="https://www.jianshu.com/p/a047176d9d65?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=seo_notes&amp;utm_source=recommendation">对OAuth的理解；</a></li>
   <li>HTTPs、tcp、udp，各种区别和安全机制，加密方式，结合项目应用</li>
   <li>https如何避免中间人劫持，https本身是如何防范的</li>
   <li>卡顿检测、内存监控</li>

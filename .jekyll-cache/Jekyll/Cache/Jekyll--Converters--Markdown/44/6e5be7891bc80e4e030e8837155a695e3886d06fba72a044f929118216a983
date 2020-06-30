@@ -1,4 +1,4 @@
-I"1Y<h4 id="1app运行过程中同时最多有几个线程如何实现的高并发">1.App运行过程中，同时最多有几个线程，如何实现的高并发</h4>
+I"�`<h4 id="1app运行过程中同时最多有几个线程如何实现的高并发">1.App运行过程中，同时最多有几个线程，如何实现的高并发</h4>
 <ul>
   <li>最多有几个线程： 根据cpu的能力，目测：50个，限制活动线程的个数不超过硬件线程的个数。</li>
   <li>Blocked状态的线程个数不在限制内，区分计算密集型和IO密集型线程，计算密集型大部分时间保证runnable状态，IO密集型线程不需要太多；</li>
@@ -225,7 +225,7 @@ content\opacity\ContentsRect.size.width</p>
 </ul>
 
 <ol>
-  <li>对OAuth的理解；</li>
+  <li><a href="https://www.jianshu.com/p/a047176d9d65?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=seo_notes&amp;utm_source=recommendation">对OAuth的理解；</a></li>
   <li>HTTPs、tcp、udp，各种区别和安全机制，加密方式，结合项目应用</li>
   <li>https如何避免中间人劫持，https本身是如何防范的</li>
   <li>卡顿检测、内存监控</li>
@@ -250,7 +250,8 @@ content\opacity\ContentsRect.size.width</p>
   <li>3)客户端验证服务器的合法性，服务器的合法性包括：证书是否过期，发行服务器证书的CA是否可靠，发行者的公钥能否正确解开服务器证书的”发行者的数字签名”，服务器证书上的域名是否和服务器的实际域名相匹配，如果合法性验证没有通过，通信将断开，如果合法性验证通过，将继续向下进行；</li>
   <li>4)客户端随机产生一个随机数A/随机数B/随机数C（Pre-Master-Key），然后用服务器的公钥(从证书中获得)对其加密，然后将该Pre-Master-Key发送给服务器。</li>
   <li>5)服务器接收到随机数A/随机数B/随机数C（Pre-Master-Key），则使用协商好的算法(H)计算出真正的用户通信过程中使用的对称加密密钥Master-Key=H(C1+S1+PreMaster);</li>
-  <li>6)至此为止，服务器和客户端之间都得到对称加密的密钥（Master-Key），之后的通信过程就使用Master-Key作为对称加密的密钥进行安全通信。</li>
+  <li>6)至此为止，服务器和客户端之间都得到对称加密的密钥（Master-Key），之后的通信过程就使用Master-Key作为对称加密的密钥进行安全通信。<br />
+<img src="http://files.pandaleo.cn/b3b7f9fe3297465b943d97b7e8526f04.png" alt="" /></li>
 </ul>
 
 <h4 id="3中间人攻击原理">3、中间人攻击原理</h4>
@@ -280,4 +281,39 @@ content\opacity\ContentsRect.size.width</p>
 <ul>
   <li>1)通过时间戳方式： 将某个参数、时间戳按照一定顺序进行排列并在某个位置插入一定的字符串，然后用MD5进行加密，将其对为参数传递到服务器。</li>
 </ul>
+
+<h4 id="5关键技能">5、关键技能</h4>
+<pre>
+精通OC语言，对runtime运行时机制原理有比较深入的了解
+
+熟悉相关热门框架的封装以及原理：YYCache缓存机制，YYImage图片原理，YYWebImage/SDWebImage底层原理,YYAsyncLayer异步绘制，美团开源框架Graver框架的底层原理，并能调优性能
+
+熟悉Alamofire,针对公司网络特质封装过网络相关框架
+
+HTTP/HTTPS、TCP/IP通信协议，安全网络都有一定掌握
+
+熟悉RxSwift函数响应式编程原理，构建过项目响应式组件，对网络、UI、常规逻辑设计独立的组件
+
+熟悉性能调优，内存管理，崩溃处理、卡顿检测、性能优化，Instruments，Analyze以及一些常用的三方性能检测工具。
+
+熟悉多线程开发，对线程安全，GCD底层原理多有比较深入的掌握
+
+熟悉MVP面向协议编程架构设计，通过适配器原则，中间者模式等等设计模式优化项目
+
+熟悉组件化设计开发，能够通过路由设计，cocoapods组件解耦通讯
+
+熟练FMDB数据库编程、对WCDB事务机制以及数据库迁移有一定的了解
+
+熟练掌握逆向开发(应用砸壳、重签名、hook、Cycript、Logos、动态调试/静态调试)
+
+熟练掌握项目的安全防护(ptrace 反调试、sysctl 防护 )
+
+熟悉shell脚本、fastlane以及Jenkins等等方式对项目持续集成&amp;自动打包分发的能力
+
+具备一定的设计与架构能力，并能结合项目定制化敏捷开发
+
+具备快速源码阅读、分析能力，平时都有参与相关框架贡献
+
+具有一定的英文阅读能力，平时都有参与github以及一些热门框架论坛社区交流
+</pre>
 :ET
