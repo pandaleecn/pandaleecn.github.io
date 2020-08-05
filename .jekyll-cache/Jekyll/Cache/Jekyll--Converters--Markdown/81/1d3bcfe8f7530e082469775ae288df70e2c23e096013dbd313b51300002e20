@@ -1,4 +1,4 @@
-I"&^<p>结构体和类的主要不同点</p>
+I"|_<p>结构体和类的主要不同点</p>
 <ul>
   <li>结构体 (和枚举) 是值类型，而类是引用类型。在设计结构体时，编译器可以保证不可变性，类不行。</li>
   <li>内存的管理方式有所不同。结构体可以被直接持有及访问，但是类的实例只能通过引用来间接地访问。结构体不会被引用，但是会被复制。也就是说，结构体的持有者是唯一的，但是类的实例却能有很多个持有者。</li>
@@ -17,7 +17,7 @@
 
 <h3 id="二可变性">二、可变性</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let mutableArray: NSMutableArray = [1,2,3]
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let mutableArray: NSMutableArray = [1,2,3]
 for _ in mutableArray {
   mutableArray.removeLastObject()
 }
@@ -77,7 +77,7 @@ for _ in 0..&lt;Int.max {
 <h3 id="三结构体">三、结构体</h3>
 <p>值类型意味着一个值变量被赋值给另一个变量时，这个值本身也会被复制，而不只限于对这个值的引用的复制。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 标量类型都是值类型
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 标量类型都是值类型
 var a = 42
 var b = a
 b += 1
@@ -162,7 +162,7 @@ screen.translated(by: Point(x: 10, y: 10))
 </code></pre></div></div>
 <h4 id="1-可变语义">1. 可变语义</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var screen = Rectangle(width: 320, height: 480) {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var screen = Rectangle(width: 320, height: 480) {
   didSet {
     print("Screen changed: \(screen)")
   }
@@ -185,7 +185,7 @@ screens[0].origin.x += 100 // Screens array changed: [(100, 0, 320, 480)]
 
 <h4 id="2-可变方法">2. 可变方法</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func +(lhs: Point, rhs: Point) -&gt; Point {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func +(lhs: Point, rhs: Point) -&gt; Point {
     return Point(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
 }
 screen.origin + Point(x: 10, y: 10) // (x: 10, y: 10)
@@ -227,7 +227,7 @@ screen.translated(by: Point(x: 20, y: 20)) // (30, 30, 320, 480)
 </code></pre></div></div>
 <h4 id="3-mutating是如何工作的inout参数">3. mutating是如何工作的：inout参数</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func translatedByTenTen(rectangle: Rectangle) -&gt; Rectangle {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func translatedByTenTen(rectangle: Rectangle) -&gt; Rectangle {
   return rectangle.translated(by: Point(x: 10, y: 10))
 }
 screen = translatedByTenTen(rectangle: screen)
@@ -255,7 +255,7 @@ var myPoint = Point.zero myPoint += Point(x: 10, y: 10) myPoint // (x: 10, y: 10
 </code></pre></div></div>
 <h4 id="4-使用值类型避免并行bug">4. 使用值类型避免并行bug</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for _ in 0..&lt;Int.max {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for _ in 0..&lt;Int.max {
   let newScanner = BinaryScanner(data: Data("hi".utf8))
   DispatchQueue.global().async {
     scanRemainingBytes(scanner: newScanner)
@@ -280,7 +280,7 @@ for _ in 0..&lt;Int.max {
 <h3 id="四写时复制">四、写时复制</h3>
 <p>在 Swift 标准库中，像是 Array，Dictionary 和 Set 这样的集合类型是通过一种叫做写时复制 (copy-on-write) 的技术实现的。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var x = [1,2,3]
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var x = [1,2,3]
 var y = x
 
 // 改变变量时发生复制
@@ -292,7 +292,7 @@ y // [1, 2]
 </code></pre></div></div>
 <h4 id="1-实现写时复制">1. 实现写时复制</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 NSMutableData 实现 Data 结构体，Data 与 Array 一样，是值类型。
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 NSMutableData 实现 Data 结构体，Data 与 Array 一样，是值类型。
 var input: [UInt8] = [0x0b,0xad,0xf0,0x0d]
 var other: [UInt8] = [0x0d]
 var d = Data(bytes: input)
@@ -334,7 +334,7 @@ y // &lt;c0010fff 55&gt;
 </code></pre></div></div>
 <h4 id="2-写时复制昂贵方式">2. 写时复制（昂贵方式）</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过 _dataForWriting 计算属性，复制 _data 并返回。
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过 _dataForWriting 计算属性，复制 _data 并返回。
 struct MyData {
   fileprivate var _data: NSMutableData
   fileprivate var _dataForWriting: NSMutableData {
@@ -374,7 +374,7 @@ for byte in 0..&lt;5 as CountableRange&lt;UInt8&gt; {
 </code></pre></div></div>
 <h4 id="3-写时复制高效方式">3. 写时复制（高效方式）</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 isKnownUniquelyReferenced 函数来检查某个引用只有一个持有者
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 isKnownUniquelyReferenced 函数来检查某个引用只有一个持有者
 // isKnownUniquelyReferenced 对于 Objective-C 类，会直接返回 false ，需封装到Swift对象中
 final class Box&lt;A&gt; {
   var unbox: A
@@ -441,7 +441,7 @@ copy // &lt;&gt;
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>final class Empty { }
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>final class Empty { }
 struct COWStruct {
   var ref = Empty()
   mutating func change() -&gt; String {
@@ -488,7 +488,7 @@ d["test"].change() // Copy
 </code></pre></div></div>
 <h4 id="五闭包和可变性">五、闭包和可变性</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将状态移到函数外部实现，每次调用时生成一个唯一的证书，直到Int.max。
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将状态移到函数外部实现，每次调用时生成一个唯一的证书，直到Int.max。
 var i = 0
 func uniqueInteger() -&gt; Int {
   i += 1
@@ -518,7 +518,7 @@ func uniqueIntegerProvider() -&gt; AnyIterator&lt;Int&gt; {
 <p>Swift 的结构体一般被存储在栈上，而非堆上。不过对于可变结构体，这其实是一种优化：默认情况下结构体是存储在堆上的，但是在绝大多数时候，这个优化会生效，并将结构体存储到栈上。编译器这么做是因为那些被逃逸闭包捕获的变量需要在栈帧之外依然存在。当编译器侦测到结构体变量被一个函数闭合的时候，优化将不再生效，此时这个结构体将存储在堆上。这样一来，在我们的例子里，就算 uniqueIntegerProvider 退出了作用域，i 也将继续存在。</p>
 <h3 id="六内存">六、内存</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 结构体/枚举，内存管理很容易，它们只会有一个持有者，所需要的内存可以被自动地创建和释放。
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 结构体/枚举，内存管理很容易，它们只会有一个持有者，所需要的内存可以被自动地创建和释放。
 struct Person {
   let name: String
   var parents: [Person]
@@ -553,7 +553,7 @@ window = nil // window: 1, view: 1
 <h4 id="1-weak引用">1. weak引用</h4>
 <p>Swift 中的弱引用是趋零的：当一个弱引用变量所引用的对象被释放时，这个变量将被自动设为 nil。被声明为可选值的原因。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
   var window: Window
   init(window: Window) {
     self.window = window
@@ -582,7 +582,7 @@ Deinit Window
 <p>使用 delegate 时一般标记为weak，否则会出现循环引用</p>
 <h4 id="2-unowned引用">2. unowned引用</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
   unowned var window: Window
   init(window: Window) {
     self.window = window
@@ -622,7 +622,7 @@ Deinit View
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 闭包对其中的变量持有强引用，回调结束后释放
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 闭包对其中的变量持有强引用，回调结束后释放
 let handle = FileHandle(forWritingAtPath: "out.html")
 let request = URLRequest(url: URL(string: "https://www.objc.io")!)
 URLSession.shared.dataTask(with: request) { (data, _, _) in
@@ -633,7 +633,7 @@ URLSession.shared.dataTask(with: request) { (data, _, _) in
 </code></pre></div></div>
 <h4 id="1-引用循环">1. 引用循环</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class View {
   var window: Window
   init(window: Window) {
     self.window = window
@@ -669,7 +669,7 @@ window?.onRotate = {
 
 <h4 id="2-捕获列表">2. 捕获列表</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 捕获列表将变量 view 标记为 weak 或 unowned，打破循环
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 捕获列表将变量 view 标记为 weak 或 unowned，打破循环
 window?.onRotate = { [weak view] in
   print("We now also need to update the view: \(view)")
 }

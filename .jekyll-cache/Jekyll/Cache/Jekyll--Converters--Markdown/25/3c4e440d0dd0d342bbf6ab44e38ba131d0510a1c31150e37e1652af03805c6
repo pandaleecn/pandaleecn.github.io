@@ -1,5 +1,5 @@
-I"<h4 id="1-类class中的属性property">1. 类Class中的属性property</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface ViewController : UIViewController
+I"><h4 id="1-类class中的属性property">1. 类Class中的属性property</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface ViewController : UIViewController
 {
     NSString *text;
 }
@@ -13,7 +13,7 @@
 </ul>
 
 <h4 id="2-类别catagory中的属性property">2. 类别Catagory中的属性property</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface UIViewController (UINavigationControllerItem)
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface UIViewController (UINavigationControllerItem)
 @property(nonatomic,readonly,retain) UINavigationItem *navigationItem;
 @property(nonatomic) BOOL hidesBottomBarWhenPushed;
 @property(nonatomic,readonly,retain) UINavigationController *navigationController;

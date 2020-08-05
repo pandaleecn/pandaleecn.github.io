@@ -1,10 +1,10 @@
-I"�<h3 id="一序列">一、序列</h3>
+I"7�<h3 id="一序列">一、序列</h3>
 <h4 id="1-定义">1. 定义</h4>
 <ul>
   <li>Sequence 协议是集合类型结构中的基础，代表的是一系列具有相同类型的值，你可以对这些值进行迭代。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 简单for循环
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 简单for循环
 for element in someSequence {
   doSomething(with: element)
 }
@@ -20,7 +20,7 @@ protocol Sequence {
 <h4 id="2-迭代器">2. 迭代器</h4>
 <p>序列通过创建一个迭代器来提供对元素的访问。迭代器每次产生一个序列的值，并且当遍历序列时对遍历状态进行管理。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol IteratorProtocol {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol IteratorProtocol {
 
   // 迭代器产生的指的类型
   associatedtype Element
@@ -77,7 +77,7 @@ struct FibsIterator: IteratorProtocol {
   <li>遵守序列协议</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 顺次生成字符串的所有前缀（包含本身）
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 顺次生成字符串的所有前缀（包含本身）
 struct PrefixIterator: IteratorProtocol {
   let string: String
   var offset: String.Index
@@ -128,7 +128,7 @@ PrefixSequence(string: "Hello").map { $0.uppercased() }
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 一个从 0 到 9 的序列
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 一个从 0 到 9 的序列
 let seq = stride(from: 0, to: 10, by: 1)
 var i1 = seq.makeIterator()
 i1.next() // Optional(0)
@@ -146,7 +146,7 @@ i2.next() // Optional(3)
   比如你在创建公有 API 时想要将一个很复杂的迭代器的具体类型隐藏起来，而不暴露它的具体实现的时候，就可以使用这种迭代器。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 很少用到，需要共享时，可以直接封装到序列之中，而不是传递
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 很少用到，需要共享时，可以直接封装到序列之中，而不是传递
 var i3 = AnyIterator(i1)
 var i4 = i3
 i3.next() // Optional(4)
@@ -159,7 +159,7 @@ i3.next() // Optional(7)
   <li>基于函数的迭代器和序列</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 不具有值语义
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 不具有值语义
 func fibsIterator() -&gt; AnyIterator&lt;Int&gt; {
   var state = (0, 1)
   return AnyIterator {
@@ -205,7 +205,7 @@ print(Array(fb3.prefix(10)))
   <li>一些非集合的序列是可以被多次遍历的，如： stride(from:to:by:) 返回的 StrideTo 类型，以及 stride(from:through:by:) 所返回的 StrideThrough 类型，使用浮点数步长来获取值，这使得它们无法被描述为一个集合，所以它们只能作为序列存在。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let standardIn = AnySequence {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let standardIn = AnySequence {
   return AnyIterator {
   readLine()
   }
@@ -227,7 +227,7 @@ let numberedStdIn = standardIn.enumerated()
 <h4 id="6-子序列">6. 子序列</h4>
 <p>Sequence的另一个关联类型，SubSequence</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol Sequence {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol Sequence {
   associatedtype Element
   associatedtype Iterator: IteratorProtocol
   where Iterator.Element == Element
@@ -249,7 +249,7 @@ let numberedStdIn = standardIn.enumerated()
   <li>子序列和原序列类型一致可以方便回传参数在原始集合类型的函数中使用，但在标准库中集合类型的切片类型并不一样，为了防止非常小的切片持有较大的原有集合类型，导致内存“泄露”。使用原始类型表示切片，可以将它的生命周期更好的绑定在局部作用域中。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 比较理想的SubSequence关联类型的声明
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 比较理想的SubSequence关联类型的声明
 // a. 本身也是序列。
 // b. 子序列的元素类型和其子序列类型，和原序列的对应类型一致。
 // b在Swift4.0中无法做到，编译器没有循环协议约束（Sequence会对自身进行引用）。
@@ -274,7 +274,7 @@ extension Sequence where Element: Equatable, SubSequence: Sequence, SubSequence.
   <li>链表</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个简单的链表枚举
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个简单的链表枚举
 enum List&lt;Element&gt; {
   case end
   /// indirect声明node为引用，枚举是值类型，无法引用自身，否则无法计算尺寸
@@ -314,7 +314,7 @@ next: List&lt;Swift.Int&gt;.end)))
 <p><img src="http://files.pandaleo.cn/2edbe499744a692d5b3e6516161c2e06.png?imageMogr2/thumbnail/!50p" alt="链表共享" />
 链表共享</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension List {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension List {
   mutating func push(_ x: Element) {
     self = self.cons(x)
   }
@@ -353,7 +353,7 @@ stack.pop() // Optional(1)
   <li>让List遵守Sequence</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension List: IteratorProtocol, Sequence {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension List: IteratorProtocol, Sequence {
   mutating func next() -&gt; Element? {
     return pop()
   }
@@ -386,7 +386,7 @@ list.elementsEqual(["1", "2", "3"]) // true
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个能够将元素入队和出队的类型
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个能够将元素入队和出队的类型
 protocol Queue {
   /// 在 `self` 中所持有的元素的类型
   associatedtype Element
@@ -401,7 +401,7 @@ protocol Queue {
   <li>队列的实现</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个高效的 FIFO 队列，其中元素类型为 `Element`
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 一个高效的 FIFO 队列，其中元素类型为 `Element`
 struct FIFOQueue&lt;Element&gt;: Queue {
   private var left: [Element] = []
   private var right: [Element] = []
@@ -427,7 +427,7 @@ struct FIFOQueue&lt;Element&gt;: Queue {
 <h4 id="1-文档中关于协议的最小需求">1. 文档中关于协议的最小需求</h4>
 <p>除了Index和Element以外，其他的关联类型都有默认值，大部分方法、属性和下标Collection的协议扩展也都提供了默认实现。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Collection 协议有六个关联类型，四个属性，七个实例方法
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Collection 协议有六个关联类型，四个属性，七个实例方法
 protocol Collection: Sequence {
   associatedtype Element // inherited from Sequence
   associatedtype Index: Comparable
@@ -523,7 +523,7 @@ q.first // Optional("1")
 <h4 id="2-遵守-expressiblebyarrayliteral-协议">2. 遵守 ExpressibleByArrayLiteral 协议</h4>
 <p>实现 ExpressibleByArrayLiteral，可以用 [value1, value2, etc] 语法创建一个队列。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension FIFOQueue: ExpressibleByArrayLiteral {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension FIFOQueue: ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: Element...) {
     left = elements.reversed()
     right = []
@@ -541,7 +541,7 @@ let queue: FIFOQueue = [1,2,3] // FIFOQueue&lt;Int&gt;(left: [3, 2, 1], right: [
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let byteQueue: FIFOQueue&lt;UInt8&gt; = [1,2,3]
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let byteQueue: FIFOQueue&lt;UInt8&gt; = [1,2,3]
 // FIFOQueue&lt;UInt8&gt;(left: [3, 2, 1], right: [])
 
 // 字面量的类型可以从上下文中推断出来
@@ -558,7 +558,7 @@ takesSetOfFloats(floats: [1,2,3])
   <li>IndexingIterator<Self> ，集合类型中的默认迭代器类型</Self></li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public struct IndexingIterator&lt;Elements: _IndexableBase&gt;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public struct IndexingIterator&lt;Elements: _IndexableBase&gt;
 : IteratorProtocol, Sequence
 {
   internal let _elements: Elements
@@ -596,7 +596,7 @@ takesSetOfFloats(floats: [1,2,3])
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CountableRange&lt;Index&gt;：
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CountableRange&lt;Index&gt;：
 extension FIFOQueue: Collection {
   ...
   typealias Indices = CountableRange&lt;Int&gt;
@@ -616,7 +616,7 @@ extension FIFOQueue: Collection {
   <li>字典的索引是 DictionaryIndex 类型，它是一个指向字典内部存储缓冲区的不透明值，是一个Int偏移值的封装。通过索引下标访问 Dictionary 时返回的值，不像用字典键下标访问时那样是一个可选值。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Dictionary {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Dictionary {
   ...
   subscript(key: Key) -&gt; Value?
 }
@@ -640,7 +640,7 @@ protocol Collection {
   <li>索引应该是一个只存储包含描述元素位置所需最小信息的简单值。在尽可能的情况下，索引不应该持有对它们集合的引用。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可以用从一个数组中获取到的整数索引值来访问另一个数组的内容
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可以用从一个数组中获取到的整数索引值来访问另一个数组的内容
 let numbers = [1,2,3,4]
 let squares = numbers.map { $0 * $0 }
 let numbersIndex = numbers.index(of: 4)! // 3
@@ -662,7 +662,7 @@ world[helloIdx] // W
 
 <h4 id="3-自定义集合索引">3. 自定义集合索引</h4>
 <p>分割字符串中的单词，采用延迟加载的方式进行迭代，不一次性地计算出所有单词。</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将使用提供的分割元素进行分割，把一个集合转变为其 SubSequence 的数组
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将使用提供的分割元素进行分割，把一个集合转变为其 SubSequence 的数组
 // 每个单词的类型都是 SubString，这正是 String 所关联的 SubSequence 类型
 var str = "Still I see monsters"
 str.split(separator: " ") // ["Still", "I", "see", "monsters"]
@@ -732,7 +732,7 @@ Array(Words(" hello world test ").prefix(2)) // ["hello", "world"]
 
 <h3 id="五切片">五、切片</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//  list.dropFirst():
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//  list.dropFirst():
 let words: Words = Words("one two three")
 let onePastStart = words.index(after: words.startIndex)
 
@@ -784,7 +784,7 @@ extension Words {
 
 <h4 id="1-切片与原集合共享索引">1. 切片与原集合共享索引</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let cities = ["New York", "Rio", "London", "Berlin",
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let cities = ["New York", "Rio", "London", "Berlin",
 "Rome", "Beijing", "Tokyo", "Sydney"]
 let slice = cities[2...4]
 cities.startIndex // 0
@@ -799,7 +799,7 @@ slice.endIndex // 5
 
 <h4 id="2-泛型-prefixiterator">2. 泛型 PrefixIterator</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct PrefixIterator&lt;Base: Collection&gt;: IteratorProtocol, Sequence {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct PrefixIterator&lt;Base: Collection&gt;: IteratorProtocol, Sequence {
   let base: Base
   var offset: Base.Index
   init(_ base: Base) {
@@ -829,7 +829,7 @@ Array(PrefixIterator(numbers))
 
 <h4 id="1-双向索引">1. 双向索引</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension BidirectionalCollection {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension BidirectionalCollection {
   /// 集合中的最后一个元素。
   /// Collection 本身也能提供 last 属性，从头迭代到尾，O(n) 操作
   public var last: Element? {
@@ -863,7 +863,7 @@ extension BidirectionalCollection {
 <h4 id="3-mutablecollection">3. MutableCollection</h4>
 <p>可变集合支持原地的元素更改。相比于 Collection，MutableCollection 只增加了，单个元素的下标访问方法 subscript 必须提供一个 setter。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension FIFOQueue: MutableCollection {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension FIFOQueue: MutableCollection {
   public var startIndex: Int { return 0 }
   public var endIndex: Int { return left.count + right.count }
   public func index(after i: Int) -&gt; Int {
@@ -918,7 +918,7 @@ playlist.first // Optional("You Belong With Me")
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 将这些元素再做一次逆序，然后合并到右侧的数组中，一次性地对整个范围进行替换
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 将这些元素再做一次逆序，然后合并到右侧的数组中，一次性地对整个范围进行替换
 extension FIFOQueue: RangeReplaceableCollection {
   mutating func replaceSubrange&lt;C: Collection&gt;(_ subrange: Range&lt;Int&gt;,
   with newElements: C) where C.Element == Element
@@ -938,7 +938,7 @@ extension FIFOQueue: RangeReplaceableCollection {
   <li>将这些要求组合起来，sort 方法被定义在了 MutableCollection 上，并包括 RandomAccessCollection 和 Element: Comparable 作为附加的约束：</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension MutableCollection
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension MutableCollection
   where Self: RandomAccessCollection, Element: Comparable {
   /// 原地对集合进行排序
   public mutating func sort() { ... }

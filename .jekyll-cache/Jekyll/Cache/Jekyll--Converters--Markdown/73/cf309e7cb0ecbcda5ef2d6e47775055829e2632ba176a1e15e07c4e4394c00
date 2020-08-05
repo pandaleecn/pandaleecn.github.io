@@ -1,4 +1,4 @@
-I"�-<h3 id="一六大设计原则">一、六大设计原则</h3>
+I".<h3 id="一六大设计原则">一、六大设计原则</h3>
 <h4 id="1-单一职责原则">1. 单一职责原则</h4>
 <ul>
   <li>一个类只负责一件事</li>
@@ -45,7 +45,7 @@
 <img src="http://files.pandaleo.cn/560646087b2926a195e215037e33f5bf.png?imageMogr2/thumbnail/!68p" alt="" /></li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// BusinessObject.h
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// BusinessObject.h
 #import &lt;Foundation/Foundation.h&gt;
 @class BusineessObject;
 typedef void(^CompletionBlock)(BOOL handled);
@@ -126,7 +126,7 @@ typedef void(^ResultBlock)(BusinessObject *handler, BOOL handled);
 <img src="http://files.pandaleo.cn/e33df49f378015a0602b64df232ec9ba.png?imageMogr2/thumbnail/!68p" alt="" /></li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 桥接A
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 桥接A
 @interface BaseObjectA : NSObject
 
 // 桥接模式的核心实现
@@ -232,14 +232,14 @@ typedef void(^ResultBlock)(BusinessObject *handler, BOOL handled);
 <img src="http://files.pandaleo.cn/52d9eb4f79a8635df69571d6bde9bd58.png?imageMogr2/thumbnail/!68p" alt="" /></li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)request {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)request {
     // 适配逻辑
     [被适配对象 某方法];
     // 适配逻辑
 }
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 具体实现
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 具体实现
 
 // 被适配对象
 @interface Target : Object
@@ -291,7 +291,7 @@ typedef void(^ResultBlock)(BusinessObject *handler, BOOL handled);
   <li>可能用的并不正确</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@implementation Panda
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@implementation Panda
 
 + (id)sharedInstance
 {
@@ -326,7 +326,7 @@ typedef void(^ResultBlock)(BusinessObject *handler, BOOL handled);
   <li>如：微博，转发、评论、赞，在不同页面产生行为，封装成行为参数化形式，执行命令</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@class Command;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@class Command;
 typedef void(^CommandCompletionCallBack)(Command* cmd);
 
 @interface Command : NSObject

@@ -1,4 +1,4 @@
-I"�*<h3 id="1-定义">1. 定义</h3>
+I"+<h3 id="1-定义">1. 定义</h3>
 <p>RunLoop是通过内部维护的事件来对事件/消息进行管理的一个对象。</p>
 
 <h3 id="2-event-loop">2. Event Loop</h3>
@@ -107,7 +107,7 @@
   <li>利用void CFRunLoopAddTimer(runLoop, timer, commonMode)，将Timer添加到CommonMode，同步到多个Mode中。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void CFRunLoopAddTimer(CFRunLoopRef rl, CFRunLoopTimerRef rlt, CFStringRef modeName) {    
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void CFRunLoopAddTimer(CFRunLoopRef rl, CFRunLoopTimerRef rlt, CFStringRef modeName) {    
 
 ……
 
@@ -166,7 +166,7 @@ static void __CFRunLoopAddItemToCommonModes(const void *value, void *ctx) {
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static NSThread *thread = nil;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static NSThread *thread = nil;
 static Bool runAlways = YES;
 
 + (NSThread *)threadForDispatch{

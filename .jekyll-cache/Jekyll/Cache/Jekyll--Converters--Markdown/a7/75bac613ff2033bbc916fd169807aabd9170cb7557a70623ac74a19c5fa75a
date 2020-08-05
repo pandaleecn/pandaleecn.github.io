@@ -1,4 +1,4 @@
-I"�<h3 id="1-afnetworking">1. AFNetworking</h3>
+I"�<h3 id="1-afnetworking">1. AFNetworking</h3>
 <ul>
   <li>iOS客户端第三方网络框架</li>
   <li>框架图
@@ -99,7 +99,7 @@
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
     [RACSignal return:@3];
     [RACSignal subScribedNext:^(id x) {
         NSLog(@"%@“,x); // 打印3

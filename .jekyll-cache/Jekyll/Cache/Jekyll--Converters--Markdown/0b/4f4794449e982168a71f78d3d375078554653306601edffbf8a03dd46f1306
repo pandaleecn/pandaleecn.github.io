@@ -1,4 +1,4 @@
-I"5<h3 id="一什么是-websocket-">一、什么是 websocket ？</h3>
+I"�5<h3 id="一什么是-websocket-">一、什么是 websocket ？</h3>
 <p>WebSocket protocol 是HTML5一种新的协议。它实现了浏览器与服务器全双工通信(full-duplex)。
 在 WebSocket API，浏览器和服务器只需要要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。
 <img src="http://files.pmpanda.com/890ac151bb9865f78ebe5940e0027f42.png" alt="socket连接过程" /></p>
@@ -6,16 +6,16 @@
 <h3 id="二socketrocketfacebook--最好的-websocket-框架">二、SocketRocket（Facebook）- 最好的 WebSocket 框架</h3>
 <p>1.使用podpod管理库</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod 'SocketRocket'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod 'SocketRocket'
 pod install
 </code></pre></div></div>
 <p>2.首先创建一个名为WebSocketManager的单例类</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+(instancetype)shared;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+(instancetype)shared;
 </code></pre></div></div>
 <p>3.创建一个枚举,分别表示WebSocket的链接状态</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef NS_ENUM(NSUInteger,WebSocketConnectType){
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef NS_ENUM(NSUInteger,WebSocketConnectType){
     WebSocketDefault = 0,   //初始状态,未连接,不需要重新连接
     WebSocketConnect,       //已连接
     WebSocketDisconnect    //连接后断开,需要重新连接
@@ -23,25 +23,25 @@ pod install
 </code></pre></div></div>
 <p>4.创建连接</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//建立长连接
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//建立长连接
 - (void)connectServer;
 </code></pre></div></div>
 <p>5.处理连接成功的结果;</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)webSocketDidOpen:(RMWebSocket *)webSocket; //连接成功回调
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)webSocketDidOpen:(RMWebSocket *)webSocket; //连接成功回调
 </code></pre></div></div>
 <p>6.处理连接失败的结果</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;//连接失败回调
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;//连接失败回调
 </code></pre></div></div>
 <p>7.接收消息</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>///接收消息回调,需要提前和后台约定好消息格式.
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>///接收消息回调,需要提前和后台约定好消息格式.
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessageWithString:(nonnull NSString *)string
 </code></pre></div></div>
 <p>8.关闭连接</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean;///关闭连接回调的代理
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean;///关闭连接回调的代理
 </code></pre></div></div>
 <p>9.为保持长链接的连接状态,需要定时向后台发送消息,就是俗称的:心跳包.
 需要创建一个定时器,固定时间发送消息.
@@ -53,7 +53,7 @@ pod install
 使用 senderheartBeat/ sendDataToServer: 方法前，需要判断 socket 是否连接，断开则重连
 （如息屏或返回主页导致的链接断开）</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)applicationDidBecomeActive:(UIApplication *)application {
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     if ([WebSocketManager shared].connectType == WebSocketDisconnect) {
         [[WebSocketManager shared] connectServer];        
@@ -62,7 +62,7 @@ pod install
 </code></pre></div></div>
 <p>12.代码实现</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// WebSocketManager.h
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// WebSocketManager.h
 #import &lt;Foundation/Foundation.h&gt;
 #import "RMWebSocket.h"
 

@@ -1,4 +1,4 @@
-I"�<p>Atom有丰富的插件库，但是由于网速慢和长期无人维护存在bug的问题，导致一些优秀的插件无法使用，非常可惜。
+I"�<p>Atom有丰富的插件库，但是由于网速慢和长期无人维护存在bug的问题，导致一些优秀的插件无法使用，非常可惜。
 这里通过Node直接安装github源码的方式，解决这两个问题。</p>
 
 <h3 id="七牛图床手动安装案例">七牛图床手动安装案例</h3>
@@ -7,11 +7,11 @@
 
 <h4 id="1-github下载markdown-assistant插件源码到atom的包目录下">1. Github下载markdown-assistant插件源码到atom的包目录下</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd ~/.atom/packages
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd ~/.atom/packages
 git clone https://github.com/knightli/markdown-assistant.git
 </code></pre></div></div>
 <h4 id="2-进入插件文件夹npm安装">2. 进入插件文件夹，npm安装</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd markdown-assistant
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd markdown-assistant
 npm install
 </code></pre></div></div>
 <h4 id="3-重启atom编辑器插件已成功安装">3. 重启Atom编辑器，插件已成功安装</h4>

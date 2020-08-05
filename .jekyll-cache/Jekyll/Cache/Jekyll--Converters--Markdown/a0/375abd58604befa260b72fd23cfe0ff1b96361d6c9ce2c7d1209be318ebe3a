@@ -1,4 +1,4 @@
-I"�<h4 id="1-类扩展的作用">1. 类扩展的作用</h4>
+I"�<h4 id="1-类扩展的作用">1. 类扩展的作用</h4>
 <ul>
   <li>声明私有属性</li>
   <li>声明私有方法</li>
@@ -6,7 +6,7 @@
 </ul>
 
 <h4 id="2-类扩展的使用">2. 类扩展的使用</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 类扩展写在.m中
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 类扩展写在.m中
 @interface ViewController ()
 @property (nonatomic, strong) NSString *worker;
 - (void)printSth; // 扩展方法

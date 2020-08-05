@@ -1,4 +1,4 @@
-I"�	<h3 id="一-kvo">一、 KVO</h3>
+I"�	<h3 id="一-kvo">一、 KVO</h3>
 <h4 id="1-定义">1. 定义</h4>
 <ul>
   <li>KVO是key-value observing的缩写。</li>
@@ -12,7 +12,7 @@
 <h4 id="3-代码实现">3. 代码实现</h4>
 <p>运行时，调用添加addObeserver方法后，会自动生成NSKVOnotifying_A</p>
 <h4 id="4-重写的setter方法具体实现">4. 重写的setter方法具体实现</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// NSKVONotifying_A的setter实现
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// NSKVONotifying_A的setter实现
 - (void)setValue:(id)obj
 {
     [self willChangeValueForKey:@"keyPath"];

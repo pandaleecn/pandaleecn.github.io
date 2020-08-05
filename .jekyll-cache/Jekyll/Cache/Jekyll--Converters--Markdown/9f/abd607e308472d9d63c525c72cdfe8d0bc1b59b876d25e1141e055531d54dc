@@ -1,4 +1,4 @@
-I"�)<h3 id="一内存管理的数据结构">一、内存管理的数据结构</h3>
+I"�)<h3 id="一内存管理的数据结构">一、内存管理的数据结构</h3>
 
 <h4 id="1-spinlock_t自旋锁">1. Spinlock_t，自旋锁</h4>
 <ul>
@@ -54,7 +54,7 @@ ptr，指针。</li>
     </ul>
   </li>
   <li>retain实现
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 两次哈希查找
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 两次哈希查找
 SideTable&amp; table = SideTables()[this];
 size_t&amp; refcntStorage = table.refcnts[this];
 
@@ -63,13 +63,13 @@ recntStorage += SIDE_TABLE_RC_ONE；
 </code></pre></div>    </div>
   </li>
   <li>release实现
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SideTable&amp; table = SideTables()[this];
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SideTable&amp; table = SideTables()[this];
 RefcountMap::iterator it = table.refcnts.find(this);
 it-&gt;second -= SIDE_TABLE_RC_ONE;
 </code></pre></div>    </div>
   </li>
   <li>retainCount实现
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SideTable&amp; table = SideTables()[this];
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SideTable&amp; table = SideTables()[this];
 // alloc时没设置，获取时初始值为1。
 size_t refcnt_result = 1;
 RefcountMap::iterator it = table.refcnts.find(this);
@@ -99,7 +99,7 @@ refcnt_result += it-&gt;second &gt;&gt; SIDE_TABLE_RC_SHIFT;
 </ul>
 
 <h4 id="5-自动释放池">5. 自动释放池</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- （void)viewDidLoad
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- （void)viewDidLoad
 {
     [super viewDidLoad];
     NSMutableArray *array = [NSMutableArray array];
@@ -109,7 +109,7 @@ refcnt_result += it-&gt;second &gt;&gt; SIDE_TABLE_RC_SHIFT;
 </code></pre></div></div>
 <ul>
   <li>AutoreleasePool实现原理
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 编译器会将@autoreleasepool{}改写为：
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 编译器会将@autoreleasepool{}改写为：
 Void *ctx = objc_autoreleasePoolPush();
 {}中的代码
 objc_autoreleasePoolPop(ctx);
