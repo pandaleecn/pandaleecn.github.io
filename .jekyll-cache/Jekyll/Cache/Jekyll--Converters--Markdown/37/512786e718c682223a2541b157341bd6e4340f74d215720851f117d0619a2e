@@ -1,4 +1,4 @@
-I"#^<p>Swift 4 的一个主要特性就是定义了一套标准的编码和解码数据的方法，所有的自定义类型都能选择使用这套方法。</p>
+I"�\<p>Swift 4 的一个主要特性就是定义了一套标准的编码和解码数据的方法，所有的自定义类型都能选择使用这套方法。</p>
 <ul>
   <li>编码，将程序内部的数据结构序列化为一些可交换的数据格式。</li>
   <li>解码，反过来将通用的数据格式反序列化为内部使用的数据结构。</li>
@@ -13,7 +13,7 @@
 </ul>
 
 <h4 id="2-某个类型通过声明自己遵守-encodable-和或-decodable-协议来表明自己具备被序列化和或反序列化的能力">2. 某个类型通过声明自己遵守 Encodable 和/或 Decodable 协议来表明自己具备被序列化和/或反序列化的能力。</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 某个类型可以将自身编码为一种外部表示。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 某个类型可以将自身编码为一种外部表示。
 public protocol Encodable {
   /// 将值编码到给定的 encoder 中。
   public func encode(to encoder: Encoder) throws
@@ -42,7 +42,7 @@ public protocol Decodable {
 
 <h3 id="二最小的例子">二、最小的例子</h3>
 <h4 id="1-自动遵循协议">1. 自动遵循协议</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 只要类型满足 Codable 协议，就编程可变解码的类型了。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 只要类型满足 Codable 协议，就编程可变解码的类型了。
 // Swift 编译器会自动帮你生成不可见的代码，来实现 Encodable 和 Decodable 协议。
 
 struct Coordinate: Codable {
@@ -59,7 +59,7 @@ struct Placemark: Codable {
 <h4 id="2-encoding-与-decoding">2. Encoding 与 Decoding</h4>
 <p>Swift 自带两个编码器，分别是 JSONEncoder 和 PropertyListEncoder，它们存在于 Foundation 中，而没有被定义在标准库里。对于满足 Codable 的类型，它们也将自动适配 Cocoa 的 NSKeyedArchiver。</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let places = [
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let places = [
   Placemark(name: "Berlin", coordinate:
     Coordinate(latitude: 52, longitude: 13)),
   Placemark(name: "Cape Town", coordinate:
@@ -96,7 +96,7 @@ do {
 <h3 id="三编码过程">三、编码过程</h3>
 <h4 id="1-容器">1. 容器</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 能将值编码为外部表示的原生格式的类型。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 能将值编码为外部表示的原生格式的类型。
 public protocol Encoder {
   /// 编码过程中到当前点的编码键路径。
   var codingPath: [CodingKey] { get }
@@ -122,7 +122,7 @@ public protocol Encoder {
 </ul>
 
 <p>每种类型的容器都对应一个协议，SingleValueEncodingContainer</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 可以支持存储和直接编码一个单一无键值的容器。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 可以支持存储和直接编码一个单一无键值的容器。
 public protocol SingleValueEncodingContainer {
   /// 编码过程中到当前点的编码键路径。
   var codingPath: [CodingKey] { get }
@@ -148,7 +148,7 @@ public protocol SingleValueEncodingContainer {
 
 <h4 id="2-值时如何对自己编码的">2. 值时如何对自己编码的</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Array&lt;Placemark&gt; 请求附件容器进行编码
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Array&lt;Placemark&gt; 请求附件容器进行编码
 extension Array: Encodable where Element: Encodable {
   public func encode(to encoder: Encoder) throws {
     var container = encoder.unkeyedContainer()
@@ -160,7 +160,7 @@ extension Array: Encodable where Element: Encodable {
 </code></pre></div></div>
 <h3 id="四生成的代码">四、生成的代码</h3>
 <h4 id="1-coding-keys">1. Coding Keys</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark {
   // 首先针对字符串的键编码生成私有的嵌套枚举类型
   private enum CodingKeys: CodingKey {
     case name
@@ -180,7 +180,7 @@ public protocol CodingKey {
 // 必须提供字符串表示，可选整数。编码器有事会忽略整数键，如JSONEncoder。编译器生成的默认代码只包含字符串键。
 </code></pre></div></div>
 <h4 id="2-encodeto方法">2. encode(to:)方法</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 编译器为 Placemark 结构体生成的 encode(to:) 方法
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 编译器为 Placemark 结构体生成的 encode(to:) 方法
 struct Placemark: Codable {
   // 将自己编码到一个键容器中，得到一颗嵌套的容器树，编码器据此将值转化为目标格式
   func encode(to encoder: Encoder) throws {
@@ -191,7 +191,7 @@ struct Placemark: Codable {
 }
 </code></pre></div></div>
 <h4 id="3-initfrom-初始化方法">3. init(from:) 初始化方法</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark: Codable {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark: Codable {
   // 解码器递归向下访问容器的层级，将解码出的值初始化为对应属性
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -208,7 +208,7 @@ struct Placemark: Codable {
   <li>将某个键从枚举中移除，以此完全跳过字段。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 修改键名时，必须将枚举的底层类型设置为String
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 修改键名时，必须将枚举的底层类型设置为String
 struct Placemark2: Codable {
   var name: String
   var coordinate: Coordinate
@@ -232,7 +232,7 @@ struct Placemark3: Codable {
 // 编译器会自动过滤 lazy 的属性。
 </code></pre></div></div>
 <h4 id="2-自定义的-encodeto-和-initfrom-实现">2. 自定义的 encode(to:) 和 init(from:) 实现</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark4: Codable {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark4: Codable {
   var name: String
   var coordinate: Coordinate?
 }
@@ -291,7 +291,7 @@ do {
 </code></pre></div></div>
 <h3 id="六常见的编码任务">六、常见的编码任务</h3>
 <h4 id="1-让其他人的代码满足-codable">1. 让其他人的代码满足 Codable</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import CoreLocation
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import CoreLocation
 struct Placemark5: Codable {
   var name: String
   var coordinate: CLLocationCoordinate2D
@@ -332,7 +332,7 @@ extension Placemark5 {
   <li>嵌套容器</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// KeyedDecodingContainer 有一个叫做 nestedContainer(keyedBy:forKey:) 的方法
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// KeyedDecodingContainer 有一个叫做 nestedContainer(keyedBy:forKey:) 的方法
 struct Placemark6: Encodable {
   var name: String
   var coordinate: CLLocationCoordinate2D
@@ -360,7 +360,7 @@ struct Placemark6: Encodable {
   <li>使用计算属性绕开问题</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark7: Codable {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Placemark7: Codable {
   var name: String
   private var _coordinate: Coordinate
   var coordinate: CLLocationCoordinate2D {
@@ -379,7 +379,7 @@ struct Placemark6: Encodable {
 
 </code></pre></div></div>
 <h4 id="2-让类满足-codable">2. 让类满足 Codable</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 在 Swift 4 中，无法为一个非 final 的类添加 Codable 特性
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 在 Swift 4 中，无法为一个非 final 的类添加 Codable 特性
 // 为不拥有的类添加 Codable 非常困难
 extension UIColor {
   var rgba: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)? {
@@ -462,7 +462,7 @@ do {
 }
 </code></pre></div></div>
 <h4 id="3-让枚举满足-codable">3. 让枚举满足 Codable</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Either&lt;A: Codable, B: Codable&gt;: Codable {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Either&lt;A: Codable, B: Codable&gt;: Codable {
   case left(A)
   case right(B)
   private enum CodingKeys: CodingKey {
@@ -527,7 +527,7 @@ do {
 
 </code></pre></div></div>
 <h4 id="4-解码多态集合">4. 解码多态集合</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 假设现在 UIView 和它的子类现在都满足 Codable
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 假设现在 UIView 和它的子类现在都满足 Codable
 let views: [UIView] = [label, imageView, button]
 
 // 为每个支持的子类创建一个枚举成员，关联值中存储实际对象

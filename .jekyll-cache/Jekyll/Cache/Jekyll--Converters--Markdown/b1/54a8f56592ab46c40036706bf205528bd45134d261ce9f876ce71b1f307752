@@ -1,4 +1,4 @@
-I"��<h3 id="一unicode而非固定宽度">一、Unicode，而非固定宽度</h3>
+I"4�<h3 id="一unicode而非固定宽度">一、Unicode，而非固定宽度</h3>
 <ul>
   <li>Unicode 是可变长格式，由编码单元组成 Unicode 标量，之后由标量组成字符。</li>
   <li>Unicode 数据可以被编码成不同宽度的编码单元，最普遍的有 8 比特 (UTF-8) 或者 16 比特 (UTF-16)。
@@ -29,7 +29,7 @@ UTF-8 向后兼容 8 比特的 ASCII，目前网上最流行的编码方式。Sw
   <li>有些字符需要通过各种编码点的组合才能正确处理。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let single = "Pok\u{00E9}mon" // Pokémon
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let single = "Pok\u{00E9}mon" // Pokémon
 let double = "Poke\u{0301}mon" // Pokémon
 
 (single, double) // ("Pokémon", "Pokémon")
@@ -92,7 +92,7 @@ crlf.count // 1
   <li>由于颜文字和 Unicode 的复杂性，需要我们对文本处理十分严谨。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Java 和 C# 两个字符长，Swift 为 1
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Java 和 C# 两个字符长，Swift 为 1
 let oneEmoji = "😂" // U+1F602
 oneEmoji.count // 1
 
@@ -157,7 +157,7 @@ family1.utf8.count // 25
 仍然存在。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 第一个集合的末尾和第二个集合的开头能够形成一个字位簇的话，它们就不再相等
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 第一个集合的末尾和第二个集合的开头能够形成一个字位簇的话，它们就不再相等
 // 与集合的特性不符
 let flagLetterC = "🇨"
 let flagLetterN = "🇳"
@@ -168,7 +168,7 @@ flag.count == flagLetterC.count + flagLetterN.count // false
 <h4 id="1-双向索引而非随机访问">1. 双向索引，而非随机访问</h4>
 <p>String 不是可以随机访问的集合，无法通过字符对应的位置，计算 Unicode 标量的个数。String 只
 实现了 BidirectionalCollection，可以从字符串的头尾移动，每次迭代一个字符。</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension String {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension String {
   var allPrefixes1: [Substring] {
     return (0...self.count).map(self.prefix)
   }
@@ -188,7 +188,7 @@ hello.allPrefixes2 // ["", "H", "He", "Hel", "Hell", "Hello"]
 <h4 id="2-范围可替换而非可变">2. 范围可替换，而非可变</h4>
 <p>String 满足 RangeReplaceableCollection 协议，支持找到字符串索引恰当的范围后，调用 replaceSubrange
 方法替换字符串。</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var greeting = "Hello, world!"
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var greeting = "Hello, world!"
 if let comma = greeting.index(of: ",") {
   greeting[..&lt;comma] // Hello
   greeting.replaceSubrange(comma..., with: " again.")
@@ -202,7 +202,7 @@ greeting // Hello again.
   <li>可以根据已有索引向前后字符迭代，不用对字节检查，反而更高效。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 返回下一个字符的索引
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 返回下一个字符的索引
 let s = "abcdef"
 let second = s.index(after: s.startIndex)
 s[second] // b
@@ -240,7 +240,7 @@ hello // Hello, world!
 如：查找某单词出现的位置，解析 CSV 文件等。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 创建 firstWord 并不会导致昂贵的复制操作或者内存申请
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 创建 firstWord 并不会导致昂贵的复制操作或者内存申请
 let sentence = "The quick brown fox jumped over the lazy dog."
 let firstSpace = sentence.index(of: " ") ?? sentence.endIndex
 let firstWord = sentence[..&lt;firstSpace] // The
@@ -308,7 +308,7 @@ extension Collection where Element: Equatable {
 类型是有效的适配类型。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func lastWord(in input: String) -&gt; String? {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func lastWord(in input: String) -&gt; String? {
   // 处理输入，操作子字符串
   let words = input.split(separators: [",", " "])
   guard let lastWord = words.last else { return nil }
@@ -345,7 +345,7 @@ let numbers = commaSeparatedNumbers
 使用编码视图单元了。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Twitter 客户端: API 接受 UTF-8 编码的字符串，但 Twitter 的字符计算算法基于 NFC 归一化的编码点。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Twitter 客户端: API 接受 UTF-8 编码的字符串，但 Twitter 的字符计算算法基于 NFC 归一化的编码点。
 // 想要为你的用户显示还可以输入多少字符
 let tweet = "Having ☕️ in a cafe\u{301} in 🇫🇷 and enjoying the ☀️."
 let characterCount = tweet
@@ -377,7 +377,7 @@ nullTerminatedUTF8.count // 63
 <h4 id="2-共享索引">2. 共享索引</h4>
 <p>字符串和他们的视图共享同样的索引类型，String.Index，可以用在视图的下标访问中。</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 Index 通过视图访问，指向视图中第一个标量，é = e + 组合变音符号
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 使用 Index 通过视图访问，指向视图中第一个标量，é = e + 组合变音符号
 let pokemon = "Poke\u{301}mon" // Pokémon
 if let index = pokemon.index(of: "é") {
   let scalar = pokemon.unicodeScalars[index] // e
@@ -422,7 +422,7 @@ family[validIndex] // 👨‍👩‍👧‍👦
   <li>所有导入到 String 的 NSString 成员可以在 Swift 源码仓库的 NSStringAPI.swift 文件中找到。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将按照单词来迭代字符串，对每个找到的单词，回调闭包都会被调用一次
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 将按照单词来迭代字符串，对每个找到的单词，回调闭包都会被调用一次
 let sentence = """
 The quick brown fox jumped \
 over the lazy dog.
@@ -446,7 +446,7 @@ Foundation 中的 NSAttributedString、NSRegularExpression 、 NSLinguisticTagge
 不过整个 API 的基础还是 NSString 的 UTF-16 编码单元集合的概念。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public struct NSRange {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public struct NSRange {
   public var location: Int
   public var length: Int
 }
@@ -491,7 +491,7 @@ within: formatted.string.utf16)
 }
 </code></pre></div></div>
 <h4 id="2-字符范围">2. 字符范围</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// as Character 转为字符，因为字符串字面量默认为 String
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// as Character 转为字符，因为字符串字面量默认为 String
 let lowercaseLetters = (“a” as Character)…“z
 // Character 并没有实现 Strideable 协议，不可数
 for c in lowercaseLetters { // 错误 … }
@@ -531,7 +531,7 @@ Array(lowercase.map(Character.init))
 集合中元素的数量，也不能对集合中的所有元素进行迭代。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 女消防员的颜文字实际上是女人 + ZWJ + 消防车
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 女消防员的颜文字实际上是女人 + ZWJ + 消防车
 let favoriteEmoji = CharacterSet("👩‍🚒👨‍🎤".unicodeScalars)
 // 错误！还是正确？
 favoriteEmoji.contains("🚒") // true
@@ -575,7 +575,7 @@ code.words() // ["struct", "Array", "Element", "Collection"]
 存储到了一个标签指针 (tagged pointer) 中，这避免了额外的堆上的内存申请。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Character 的实际定义
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Character 的实际定义
 public struct Character {
   internal enum Representation {
     case smallUTF16(Builtin.Int63)
@@ -587,7 +587,7 @@ public struct Character {
 MemoryLayout&lt;Character&gt;.size // 8
 </code></pre></div></div>
 <h3 id="九简单的正则表达式匹配器">九、简单的正则表达式匹配器</h3>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 简单的正则表达式类型，支持 ^ 和 $ 锚点,
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 简单的正则表达式类型，支持 ^ 和 $ 锚点,
 /// 并且匹配 . 和 *
 public struct Regex {
   private let regexp: String
@@ -684,7 +684,7 @@ for idx in text.startIndex...text.endIndex {
 一个 Unicode 标量还是从一个字位簇来创建实例这样细粒度的逻辑，只需要实现字符串版本就行了。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension Regex: ExpressibleByStringLiteral {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension Regex: ExpressibleByStringLiteral {
   public init(stringLiteral value: String) {
     regexp = value
   }
@@ -706,7 +706,7 @@ findMatches(in: ["foo","bar","baz"], regex: "^b..") // ["bar", "baz"]
 是一个容器，那么遵循 CustomDebugStringConvertible 以打印其所含元素的调试描述信息会更考究一些。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>print(Regex("colou?r"))
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>print(Regex("colou?r"))
 // 打印 Regex("colou?r")
 
 // 当类型有一些不希望被展示的私有变量，自定义类被传给 print 时输出格式化输出
@@ -771,7 +771,7 @@ func doSomethingAttractive&lt;T: CustomStringConvertible&gt;(with value: T) {
   <li>流还能够持有状态，或者对输出进行变形，也能够将多个流链接起来。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// print(_:to:) 中的 Target 实现了 TextOutputStream 协议
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// print(_:to:) 中的 Target 实现了 TextOutputStream 协议
 public func print&lt;Target: TextOutputStream&gt;
 (_ items: Any..., separator: String = " ",
 terminator: String = "\n", to output: inout Target)
@@ -889,7 +889,7 @@ output
 <h3 id="十三字符串性能">十三、字符串性能</h3>
 <p>UTF-16 的视图再这个测试中是最快的，能确保自己所做的操作可以正确处理 UTF-16 的数据，使用 UTF-16
 会在做非常繁重的字符串操作时带来相当不错的性能提升。</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol StringViewSelector {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol StringViewSelector {
   associatedtype View: Collection
   static var caret: View.Element { get }
   static var asterisk: View.Element { get }

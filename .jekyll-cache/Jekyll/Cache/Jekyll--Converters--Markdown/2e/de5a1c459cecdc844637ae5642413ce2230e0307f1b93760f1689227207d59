@@ -1,4 +1,4 @@
-I"�<h4 id="1-分类的用途">1. 分类的用途</h4>
+I"�<h4 id="1-分类的用途">1. 分类的用途</h4>
 <p>声明私有方法、分解体积庞大的类文件、把Framework的私有方法公开。</p>
 <h4 id="2-分类的特点">2. 分类的特点</h4>
 <ul>
@@ -14,7 +14,7 @@
   <li>属性，只声明对应的get方法和set方法，并没有添加实例变量。通过关联对象添加。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// objc4-680
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// objc4-680
 struct category_t {
     const char *name;
     classref_t cls;
@@ -57,7 +57,7 @@ images: 镜像</p>
   </li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static void remethodizeClass(Class cls)
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static void remethodizeClass(Class cls)
 {
 
             ……

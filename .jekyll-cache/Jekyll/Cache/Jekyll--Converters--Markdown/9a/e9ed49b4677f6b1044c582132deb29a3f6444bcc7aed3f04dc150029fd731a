@@ -1,4 +1,4 @@
-I"�
+I"�
 <h4 id="1-对象类对象原类对象">1. 对象、类对象、原类对象</h4>
 <ul>
   <li>类对象存储实例方法列表等信息</li>
@@ -14,10 +14,10 @@
 <h4 id="2-消息传递">2. 消息传递</h4>
 <p><img src="http://files.pandaleo.cn/9358bd2e0b4ec6c5c31747efbfd138d3.png" alt="" />
 两次打印都是Phone</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void objc_msgSend(void /* id self, SEL op, … */)
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void objc_msgSend(void /* id self, SEL op, … */)
 </code></pre></div></div>
 <p><img src="http://files.pandaleo.cn/fa53d1012e0ea7a39c0c42ac693480aa.png" alt="" /></p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void objc_msgSendSuper(void /* struct objc_super *super, SEL op, …*/)
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void objc_msgSendSuper(void /* struct objc_super *super, SEL op, …*/)
 </code></pre></div></div>
 <p><img src="http://files.pandaleo.cn/013ec9212a419b944fa7f955108bd6d7.png" alt="" /></p>
 <ul>

@@ -1,6 +1,6 @@
-I"2c<h3 id="一数组">一、数组</h3>
+I"�a<h3 id="一数组">一、数组</h3>
 <h4 id="1-数组和可变性">1. 数组和可变性</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let fibs = [0, 1, 1, 2, 3, 5]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let fibs = [0, 1, 1, 2, 3, 5]
 var mutableFibs = [0, 1, 1, 2, 3, 5]
 mutableFibs.append(8)
 mutableFibs.append(contentsOf: [13, 21])
@@ -55,7 +55,7 @@ d // ( 1, 2, 3 )
   </li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var squared: [Int] = []
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var squared: [Int] = []
 for fib in fibs {
 squared.append(fib * fib)
 }
@@ -109,7 +109,7 @@ extension Array {
   <li>自定义扩展的封装</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let names = ["Paula", "Elena", "Zoe"]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let names = ["Paula", "Elena", "Zoe"]
 var lastNameEndingInA: String?
 for name in names.reversed() where name.hasSuffix("a") {
   lastNameEndingInA = name
@@ -134,7 +134,7 @@ else { return }
   <li>可变的带有状态的闭包</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension Array {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension Array {
 
     // 创建一个中间变量存储每一步的值，然后使用map从中间值逐步计算结果数组
     func accumulate&lt;Result&gt;(_ initialResult: Result, _ nextPartialResult: (Result, Element) -&gt; Result) -&gt; [Result]
@@ -164,7 +164,7 @@ arr.accumulate(0, +)
   <li>Filter</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 对 0..&lt;10 进行 map 来得到所有平方数，然后再用 filter 过滤出其中的偶数
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 对 0..&lt;10 进行 map 来得到所有平方数，然后再用 filter 过滤出其中的偶数
 (1..&lt;10).map { $0 * $0 }.filter { $0 % 2 == 0 } // [4, 16, 36, 64]
 
 // 错误
@@ -189,7 +189,7 @@ evenNums.all { $0 % 2 == 0 } // true
 reduce方法：将一个初始值和一个将中间值与序列中的元素进行合并的函数进行抽象。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let fibs = [0, 1, 1, 2, 3, 5]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let fibs = [0, 1, 1, 2, 3, 5]
 var total = 0
 for num in fibs {
   total = total + num
@@ -250,7 +250,7 @@ extension Array {
   <li>flatMap</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func extractLinks(markdownFile: String) -&gt; [URL]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func extractLinks(markdownFile: String) -&gt; [URL]
 let markdownFiles: [String] = // ...
 let nestedLinks = markdownFiles.map(extractLinks)
 let links = nestedLinks.joined()
@@ -288,7 +288,7 @@ let result = suits.flatMap { suit in
   <li>forEach</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for element in [1,2,3] {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for element in [1,2,3] {
   print(element)
 }
 
@@ -331,7 +331,7 @@ extension Array where Element: Equatable {
 <img src="http://files.pandaleo.cn/f63b30887af7b9e47d198158a37466ea.png?imageMogr2/thumbnail/!50p" alt="" /></li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过切片获取某个范围中的元素
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过切片获取某个范围中的元素
 let slice = fibs[1...]
 slice // [1, 1, 2, 3, 5]
 type(of: slice) // ArraySlice&lt;Int&gt;
@@ -348,7 +348,7 @@ Swift数组可以桥接到OC和C中，由于NSArray只能持有对象，在桥�
 
 <h3 id="二字典dictionary">二、字典Dictionary</h3>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 定义app设置界面，使用字典作为数据模型
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 定义app设置界面，使用字典作为数据模型
 enum Setting {
   case text(String)
   case int(Int)
@@ -385,7 +385,7 @@ defaultSettings["Name"] // Optional(Setting.text("My iPhone"))
   </li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 改变不可变字典时，先进行复制，原字典不会改变
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 改变不可变字典时，先进行复制，原字典不会改变
 var userSettings = defaultSettings
 userSettings["Name"] = .text("Jared's iPhone")
 userSettings["Do Not Disturb"] = .bool(true)
@@ -398,7 +398,7 @@ oldName // Optional(Setting.text("Jared\'s iPhone"))
 
 <h4 id="3有用的字典方法">3.有用的字典方法</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// merge，合并字典
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// merge，合并字典
 // 合并键值对，使用了 { $1 } 来作为合并两个值的策略。
 // 某个键同时存在于 settings 和 overriddenSettings 中时，使用 overriddenSetttings 中的值。
 
@@ -446,14 +446,14 @@ settingsAsStrings // ["Name": "Jane\'s iPhone", "Airplane Mode": "false"]
 <h3 id="三set">三、Set</h3>
 <h4 id="1定义-1">1.定义</h4>
 <p>集合是一组无序的元素，每个元素只会出现一次，可以将集合想像为一个只存储了键而没有存储值的字典。</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Set 遵守 ExpressibleByArrayLiteral 协议，可以用数组字面量的方式初始化一个集合
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Set 遵守 ExpressibleByArrayLiteral 协议，可以用数组字面量的方式初始化一个集合
 let naturals: Set = [1, 2, 3, 2]
 naturals // [2, 3, 1]
 naturals.contains(3) // true
 naturals.contains(0) // false
 </code></pre></div></div>
 <h4 id="2集合代数">2.集合代数</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 在一个集合中求另一个集合的补集
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 在一个集合中求另一个集合的补集
 let iPods: Set = ["iPod touch", "iPod nano", "iPod mini",
 "iPod shuffle", "iPod Classic"]
 let discontinuedIPods: Set = ["iPod mini", "iPod Classic",
@@ -482,7 +482,7 @@ discontinued
 ，比Set<Int>更加高效。</Int></li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var indices = IndexSet()
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var indices = IndexSet()
 indices.insert(integersIn: 1..&lt;5)
 indices.insert(integersIn: 11..&lt;15)
 let evenIndices = indices.filter { $0 % 2 == 0 } // [2, 4, 12, 14]
@@ -492,7 +492,7 @@ let evenIndices = indices.filter { $0 % 2 == 0 } // [2, 4, 12, 14]
 </ul>
 
 <h4 id="4在闭包中使用集合">4.在闭包中使用集合</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 按原来顺序找到序列中所有不重复的元素
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 按原来顺序找到序列中所有不重复的元素
 extension Sequence where Element: Hashable {
   func unique() -&gt; [Element] {
     var seen: Set&lt;Element&gt; = []
@@ -515,7 +515,7 @@ extension Sequence where Element: Hashable {
   <li>范围代表的是两个值的区间，它由上下边界进行定义。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过 ..&lt; 来创建一个不包含上边界的半开范围，或者使用 ... 创建同时包含上下边界的闭合范围：
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 通过 ..&lt; 来创建一个不包含上边界的半开范围，或者使用 ... 创建同时包含上下边界的闭合范围：
 // 0 到 9, 不包含 10
 let singleDigitNumbers = 0..&lt;10
 Array(singleDigitNumbers) // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -535,7 +535,7 @@ let upToZ = ..&lt;Character("z")
   </li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 不能对 Range 或者 ClosedRange 进行迭代
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 不能对 Range 或者 ClosedRange 进行迭代
 // 可以检查某个元素是否存在于范围
 singleDigitNumbers.contains(9) // true
 lowercaseLetters.overlaps("c"..&lt;"f") // true
@@ -550,7 +550,7 @@ lowercaseLetters.overlaps("c"..&lt;"f") // true
 </ul>
 
 <h4 id="2可数范围">2.可数范围</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for i in 0..&lt;10 {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for i in 0..&lt;10 {
   print("\(i)", terminator: " ")
 } // 0 1 2 3 4 5 6 7 8 9
 </code></pre></div></div>
@@ -583,7 +583,7 @@ lowercaseLetters.overlaps("c"..&lt;"f") // true
 
 <h4 id="3部分范围">3.部分范围</h4>
 <p>部分范围 (partial range) 指的是将 … 或 ..&lt; 作为前置或者后置运算符来使用时所构造的范围。</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Bound不满足Strideable，无法迭代
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Bound不满足Strideable，无法迭代
 let fromA: PartialRangeFrom&lt;Character&gt; = Character("a")...
 
 // 没有下界，无法开始迭代
@@ -594,7 +594,7 @@ let upto10: PartialRangeUpTo&lt;Int&gt; = ..&lt;10
 let fromFive: CountablePartialRangeFrom&lt;Int&gt; = 5...
 </code></pre></div></div>
 <h4 id="4范围表达式">4.范围表达式</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// RangeExpression 协议
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// RangeExpression 协议
 public protocol RangeExpression {
   associatedtype Bound: Comparable
   func contains(_ element: Bound) -&gt; Bool

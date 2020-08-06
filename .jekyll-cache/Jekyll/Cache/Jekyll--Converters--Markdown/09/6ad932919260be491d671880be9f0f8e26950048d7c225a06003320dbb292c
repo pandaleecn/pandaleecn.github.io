@@ -1,7 +1,7 @@
-I"b<h3 id="一哨岗值">一、哨岗值</h3>
+I"�`<h3 id="一哨岗值">一、哨岗值</h3>
 <p>在编程世界中有一种非常通用的模式，那就是某个操作是否要返回一个有效值。</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// C。EOF 只是对于 -1 的一个 #define
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// C。EOF 只是对于 -1 的一个 #define
 int ch;
 while ((ch = getchar()) != EOF) {
   printf("Read character %c\n", ch);
@@ -36,7 +36,7 @@ if ([someString rangeOfString:@"Swift"].location != NSNotFound) {
 
 <h3 id="二通过枚举解决魔法数的问题">二、通过枚举解决魔法数的问题</h3>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Optional&lt;Wrapped&gt; {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Optional&lt;Wrapped&gt; {
   case none
   case some(Wrapped)
 }
@@ -46,7 +46,7 @@ if ([someString rangeOfString:@"Swift"].location != NSNotFound) {
   <li>标签联合，将若干不同的可能类型保存在内存的同一空间中，并使用一个标签来区分到底被持有的是什么类型。在Swift枚举中，枚举的case就是标签。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Swift 中与 find 等效的方法 index(of:) 所返回的不是一个索引值，而是一个 Optional&lt;Index&gt;。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Swift 中与 find 等效的方法 index(of:) 所返回的不是一个索引值，而是一个 Optional&lt;Index&gt;。
 extension Collection where Element: Equatable {
   func index(of element: Element) -&gt; Optional&lt;Index&gt; {
     var idx = startIndex
@@ -85,7 +85,7 @@ switch array.index(of: "four") {
 <h3 id="三可选值概览">三、可选值概览</h3>
 <h4 id="1-if-let">1. if let</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var array = ["one", "two", "three", "four"]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var array = ["one", "two", "three", "four"]
 if let idx = array.index(of: "four") {
   array.remove(at: idx)
 }
@@ -133,7 +133,7 @@ let name = username {
 </code></pre></div></div>
 <h4 id="2-while-let">2. while let</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Unix 中 cat 命令等价的函数
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Unix 中 cat 命令等价的函数
 while let line = readLine() {
   print(line)
 }
@@ -207,7 +207,7 @@ while current1 != nil {
 </code></pre></div></div>
 <h4 id="3-双重可选值">3. 双重可选值</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可选值嵌套在可选值中
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可选值嵌套在可选值中
 let stringNumbers = ["1", "2", "three"]
 let maybeInts = stringNumbers.map { Int($0) } // [Optional(1), Optional(2), nil]
 
@@ -266,7 +266,7 @@ func ~=&lt;T, U&gt;(_: T, _: U) -&gt; Bool { return true }
 </code></pre></div></div>
 <h4 id="4-if-var-and-while-var">4. if var and while var</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// i是本地的复制，不改变原值
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// i是本地的复制，不改变原值
 let number = "1"
 if var i = Int(number) {
     i += 1
@@ -275,7 +275,7 @@ if var i = Int(number) {
 </code></pre></div></div>
 <h4 id="5-解包后可选值的作用域">5. 解包后可选值的作用域</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let array = [1,2,3]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let array = [1,2,3]
 if !array.isEmpty {
   print(array[0])
 }
@@ -334,7 +334,7 @@ func doStuff2(withArray a: [Int]) {
 </code></pre></div></div>
 <h4 id="6-可选链">6. 可选链</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可选链，方法可能会不被调用
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 可选链，方法可能会不被调用
 delegate?.callback()
 
 let str: String? = "Never say never"
@@ -407,7 +407,7 @@ b // nil
 </code></pre></div></div>
 <h4 id="7-nil-合并运算符">7. nil 合并运算符</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let stringteger = "1"
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let stringteger = "1"
 let number = Int(stringteger) ?? 0
 // lhs != nil ? lhs! : rhs
 
@@ -451,7 +451,7 @@ let s2: String?? = .some(nil) // Optional(nil)
 </code></pre></div></div>
 <h4 id="8-在字符串插值中使用可选值">8. 在字符串插值中使用可选值</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let bodyTemperature: Double? = 37.0
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let bodyTemperature: Double? = 37.0
 let bloodGlucose: Double? = nil
 print(bodyTemperature) // Optional(37.0)
 // 警告：表达式被隐式强制从 'Double?' 转换为 Any
@@ -476,7 +476,7 @@ print("Blood glucose level: \(bloodGlucose ??? "n/a")")
 </code></pre></div></div>
 <h4 id="9-可选值-map">9. 可选值 map</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let characters: [Character] = ["a", "b", "c"]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let characters: [Character] = ["a", "b", "c"]
 String(characters[0]) // a
 
 var firstCharAsString: String? = nil
@@ -529,7 +529,7 @@ extension Array {
 </code></pre></div></div>
 <h4 id="10-可选值-flatmap">10. 可选值 flatMap</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let stringNumbers = ["1", "2", "3", "foo"]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let stringNumbers = ["1", "2", "3", "foo"]
 let x = stringNumbers.first.map { Int($0) } // Optional(Optional(1))
 
 // flatMap 可以把结果展平为单个可选值
@@ -563,7 +563,7 @@ extension Optional {
 </code></pre></div></div>
 <h4 id="11-使用-flatmap-过滤-nil">11. 使用 flatMap 过滤 nil</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let numbers = ["1", "2", "3", "foo"]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let numbers = ["1", "2", "3", "foo"]
 var sum = 0
 for case let i? in numbers.map({ Int($0) }) {
   sum += i
@@ -592,7 +592,7 @@ extension Sequence {
 </code></pre></div></div>
 <h4 id="12-可选值判等">12. 可选值判等</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let regex = "^Hello$"
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let regex = "^Hello$"
 // ...
 if regex.first == "^" {
   // 只匹配字符串开头
@@ -641,7 +641,7 @@ dictWithNils.index(forKey: "three") // nil
 </code></pre></div></div>
 <h4 id="13-equatable-和-">13. Equatable 和 ==</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 两个可选值整数的数组
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 两个可选值整数的数组
 let a: [Int?] = [1, 2, nil]
 let b: [Int?] = [1, 2, nil]
 // 错误：binary operator '==' cannot be applied to two [Int?] operands
@@ -667,7 +667,7 @@ func ==&lt;T: Equatable&gt;(lhs: [T?], rhs: [T?]) -&gt; Bool {
   <li>如果你想要在可选值之间进行除了相等之外的关系比较的话，现在你需要先对它们进行解包，然后明确地指出 nil 要如何处理。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let temps = ["-459.67", "98.6", "0", "warm"]
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let temps = ["-459.67", "98.6", "0", "warm"]
 let belowFreezing = temps.filter { Double($0) &lt; 0 }
 // Double("warm") 将会返回 nil，而 nil 是小于 0 的
 </code></pre></div></div>
@@ -677,7 +677,7 @@ let belowFreezing = temps.filter { Double($0) &lt; 0 }
   <li>产生错误的值强制解包终止程序会方便报错。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func flatten&lt;S: Sequence, T&gt;
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func flatten&lt;S: Sequence, T&gt;
 (source: S) -&gt; [T] where S.Element == T? {
   let filtered = source.lazy.filter { $0 != nil }
   return filtered.map { $0! }
@@ -702,7 +702,7 @@ ages.filter { (_, age) in age &lt; 50 }
 </code></pre></div></div>
 <h4 id="1-改进强制解包的错误信息">1. 改进强制解包的错误信息</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>infix operator !!
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>infix operator !!
 func !! &lt;T&gt;(wrapped: T?, failureText: @autoclosure () -&gt; String) -&gt; T {
   if let x = wrapped { return x }
   fatalError(failureText())
@@ -713,7 +713,7 @@ let i = Int(s) !! "Expecting integer, got \"\(s)\"
 </code></pre></div></div>
 <h4 id="2-在调试版本中进行断言">2. 在调试版本中进行断言</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>infix operator !?
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>infix operator !?
 func !?&lt;T: ExpressibleByIntegerLiteral&gt;
 (wrapped: T?, failureText: @autoclosure () -&gt; String) -&gt; T
 {
@@ -763,7 +763,7 @@ var output: String? = nil output?.write(“something”) !? “Wasn’t expectin
 </ul>
 
 <h4 id="1-隐式可选值行为">1. 隐式可选值行为</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 隐式解包仍具有可选值的特性
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 隐式解包仍具有可选值的特性
 var s: String! = "Hello"
 s?.isEmpty // Optional(false)
 if let s = s { print(s) }

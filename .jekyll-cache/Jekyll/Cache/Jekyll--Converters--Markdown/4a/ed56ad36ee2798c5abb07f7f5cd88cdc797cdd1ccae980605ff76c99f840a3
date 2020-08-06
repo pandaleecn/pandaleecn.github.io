@@ -1,4 +1,4 @@
-I"	H<h3 id="一理论知识">一、理论知识</h3>
+I"%G<h3 id="一理论知识">一、理论知识</h3>
 <p>蓝牙开发框架 Core Buletooth，可以与支持蓝牙 4.0 的第三方蓝交互，提供了与蓝牙设备进行通信所需要的协议和类。蓝牙4.0 一低功耗著称，所以也叫BLE（Bluetooth Low Energy），目前广泛应用于智能手环、智能嵌入式设备、智能家居等领域。</p>
 <h4 id="1-重要的类与协议">1. 重要的类与协议</h4>
 <ul>
@@ -43,7 +43,7 @@
   <li>1.导入依赖库、声明委托、定义变量</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "ViewController.h"
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "ViewController.h"
 #import &lt;CoreBluetooth/CoreBluetooth.h&gt;
 
 #define mBLEName @"LDP"
@@ -67,7 +67,7 @@
   <li>2.程序开始时初始化设备</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (CBCentralManager *)mCentral
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (CBCentralManager *)mCentral
 {
     if (!_mCentral) {
         _mCentral = [[CBCentralManager alloc] initWithDelegate:self
@@ -90,7 +90,7 @@
   <li>3.当程序退出时，断开连接</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidDisappear:(BOOL)animated
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
 
@@ -111,7 +111,7 @@
   <li>4.扫描外设</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//只要中心管理者初始化,就会触发此代理方法
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//只要中心管理者初始化,就会触发此代理方法
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
     switch (central.state) {
@@ -148,7 +148,7 @@
   <li>5.连接外设</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//发现外设后调用的方法
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//发现外设后调用的方法
 - (void)centralManager:(CBCentralManager *)central // 中心管理者
  didDiscoverPeripheral:(CBPeripheral *)peripheral // 外设
      advertisementData:(NSDictionary *)advertisementData // 外设携带的数据
@@ -169,7 +169,7 @@
   <li>6.获取服务</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//中心管理者连接外设成功
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//中心管理者连接外设成功
 - (void)centralManager:(CBCentralManager *)central // 中心管理者
   didConnectPeripheral:(CBPeripheral *)peripheral // 外设
 {
@@ -195,7 +195,7 @@
   <li>7.获取服务中的特征</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//发现外设的服务后调用的方法
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//发现外设的服务后调用的方法
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
     // 是否获取失败
@@ -216,7 +216,7 @@
   <li>8.获取特征中的值和描述</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//从服务中发现外设特征的时候调用的代理方法
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//从服务中发现外设特征的时候调用的代理方法
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
     if(error){
@@ -260,7 +260,7 @@
   <li>9.读取特征中的值和描述</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//更新特征值的时候调用，可以理解为获取蓝牙发回的数据
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//更新特征值的时候调用，可以理解为获取蓝牙发回的数据
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     NSString *value = [[NSString alloc] initWithData:characteristic.value encoding:NSASCIIStringEncoding];
@@ -278,7 +278,7 @@
   <li>10.状态改变和发现描述</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//通知状态改变时调用
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//通知状态改变时调用
 -(void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     if(error){
         NSLog(@"特征名：%@，改变通知状态失败",characteristic);
@@ -305,7 +305,7 @@
   <li>11.发送数据</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//发送数据
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//发送数据
 -(void)sendDataToBLE:(NSString *)data{
     NSData* myData = [data dataUsingEncoding:NSUTF8StringEncoding];
     [self.mPeripheral writeValue:myData // 写入的数据
@@ -332,7 +332,7 @@
 <img src="http://files.pmpanda.com/29f6ac347e9b375671e8d420d6a3363e.png" alt="" /></li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pragma mark--CRC8校验
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pragma mark--CRC8校验
 + (NSString *)crc8_maxin_byteCheckWithHexString:(NSString*)hexString {
     NSString * tempStr = hexString;
     NSArray *tempArray = [self getByteForString:hexString];

@@ -1,5 +1,5 @@
-I"i<h4 id="1-类class中的属性property">1. 类Class中的属性property</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface ViewController : UIViewController
+I"V<h4 id="1-类class中的属性property">1. 类Class中的属性property</h4>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface ViewController : UIViewController
 {
     NSString *text;
 }

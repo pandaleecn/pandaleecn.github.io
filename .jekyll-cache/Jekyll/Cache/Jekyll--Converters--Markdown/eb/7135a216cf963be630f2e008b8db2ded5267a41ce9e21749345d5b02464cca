@@ -1,4 +1,4 @@
-I"X<h4 id="1-读写权限">1. 读写权限</h4>
+I"E<h4 id="1-读写权限">1. 读写权限</h4>
 <ul>
   <li>readonly</li>
   <li>readwrite</li>
@@ -66,7 +66,7 @@
 </ul>
 
 <h4 id="8-mrc下重写retain修改变量的setter方法">8. MRC下重写retain修改变量的setter方法</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@property(nonatomic, retain) id obj;
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@property(nonatomic, retain) id obj;
 - （void)setObj:(id)obj
 {
   if (_obj != obj) {

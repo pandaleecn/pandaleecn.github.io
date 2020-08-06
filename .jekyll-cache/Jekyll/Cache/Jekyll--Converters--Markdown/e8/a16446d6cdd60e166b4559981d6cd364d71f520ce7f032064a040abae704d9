@@ -1,8 +1,8 @@
-I"�(<h4 id="1-block介绍和调用">1. Block介绍和调用</h4>
+I"(<h4 id="1-block介绍和调用">1. Block介绍和调用</h4>
 <p>定义：Block是将函数及其执行上下文封装起来的对象 
 <img src="http://files.pandaleo.cn/67c852101669450f90bd710124949ff3.png" alt="" /></p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
     int multiplier = 6;
     int(^Block)(int) = ^int(int num){
         return num * multiplier;
@@ -67,7 +67,7 @@ static void _I_TBlock_method(TBlock * self, SEL _cmd) {
 <h4 id="2-截获变量">2. 截获变量</h4>
 <p>在block中使用定义的变量叫截获变量。</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
     int multiplier = 6; // 基本数据类型
     int(^Block)(int) = ^int(int num){
         return num * multiplier;
@@ -88,7 +88,7 @@ static void _I_TBlock_method(TBlock * self, SEL _cmd) {
   <li>全局变量、静态全局变量，不截获。</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// TBlock.m文件
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// TBlock.m文件
 @implementation TBlock
 
 // 全局变量
@@ -157,7 +157,7 @@ static void _I_MCBlock_method(MCBlock * self, SEL _cmd) {
 <img src="http://files.pandaleo.cn/089f8e9bcbe245a5ea07e5cdb4d24230.png" alt="" /></li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
     NSMutableArray *array = [NSMutableArray array];
     void(^Block)(void) = ^{
         [array addObject:@123]; // 只是使用，未赋值
@@ -179,7 +179,7 @@ static void _I_MCBlock_method(MCBlock * self, SEL _cmd) {
 <img src="http://files.pandaleo.cn/aa859656792c80c60e81ab73528f6d08.png?imageMogr2/thumbnail/!68p" alt="" /></li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
     __block int multiplier = 6;
     int(^Block)(int) = ^int(int num)
     {
@@ -227,7 +227,7 @@ static void _I_MCBlock_method(MCBlock * self, SEL _cmd) {
 </ul>
 
 <h4 id="5-block的循环引用">5. Block的循环引用</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
     _array = [NSMutableArray arrayWithObject:@"block"];
     _strBlk = ^NSString*(NSString *num){
         return [NSString stringwithFormat:@"helloc_%@", array[0]];
@@ -240,7 +240,7 @@ static void _I_MCBlock_method(MCBlock * self, SEL _cmd) {
 <img src="http://files.pandaleo.cn/b844fc426e4c0bc64fb4add1ea1f1341.png?imageMogr2/thumbnail/!68p" alt="" /></li>
   <li>解决方案：__weak NSArray *weakArray = _array;<br />
 <img src="http://files.pandaleo.cn/d6b1b340d22f383d5bdf20a3326dd16c.png?imageMogr2/thumbnail/!68p" alt="" />
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
   __block TBlock* blockSelf = self;
   _blk = ^int(int num){
       // var = 2

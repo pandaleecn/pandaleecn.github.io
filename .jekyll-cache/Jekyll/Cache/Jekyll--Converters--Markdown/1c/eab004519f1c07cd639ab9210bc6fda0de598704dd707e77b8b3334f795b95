@@ -1,14 +1,14 @@
-I"�<h4 id="1-解决凭证缓存问题">1. 解决凭证缓存问题</h4>
+I"�<h4 id="1-解决凭证缓存问题">1. 解决凭证缓存问题</h4>
 <p>由于之前配置过github用户名和密码，每次提交的时候都会默认使用已废弃的用户名信息，修改git全局配置
 仍然无效，最终才发现存在缓存。</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 全部 unset 一遍呗
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 全部 unset 一遍呗
 $ git config --local --unset credential.helper
 $ git config --global --unset credential.helper
 # 这个要 sudo
 $ sudo git config --system --unset credential.helper
 </code></pre></div></div>
 <h4 id="2-缓存git用户名密码">2. 缓存git用户名密码</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global credential.helper store
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global credential.helper store
 </code></pre></div></div>
 <p>通过此命令，会对后续git操作的用户名密码进行平整缓存，更换git用户名密码时需要重新unset。</p>
 :ET

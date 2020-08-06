@@ -1,4 +1,4 @@
-I"�&<h3 id="一gcd">一、GCD</h3>
+I"�%<h3 id="一gcd">一、GCD</h3>
 
 <h4 id="1-同步异步-和-串行并发">1. 同步/异步 和 串行/并发</h4>
 <ul>
@@ -29,7 +29,7 @@
 </ul>
 
 <h4 id="2-同步串行">2. 同步串行</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad { // 死锁
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad { // 死锁
     dispatch_sync(dispatch_get_main_queue(), ^{
         [self doSomething];
     }
@@ -39,7 +39,7 @@
   <li>队列引起的循环等待，并不是线程引起的。
 <img src="http://files.pandaleo.cn/8ec98c32c43731210961527c336a4ad3.png?imageMogr2/thumbnail/!40p" alt="" /></li>
   <li>主队列上分配的任务，无论是同步还是异步，最终都要到主线程上执行
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
   // 自定义串行队列，没问题
   dispatch_sync(serialQueue, ^{
       [self doSomething];
@@ -53,7 +53,7 @@
 </ul>
 
 <h4 id="3-同步并发">3. 同步并发</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
     NSLog(@"1");
     dispatch_sync(global_queue, ^{
         NSLog(@"2");
@@ -66,14 +66,14 @@
 } // 输出：12345
 </code></pre></div></div>
 <h4 id="4-异步串行">4. 异步串行</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self doSomething];
     }
 }
 </code></pre></div></div>
 <h4 id="5-异步并发">5. 异步并发</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)viewDidLoad {
     dispatch_async(global_queue(), ^{
         NSLog(@"1");
         [self performSelector: @selector(printLog) withObject: nil afterDelay: 0]
@@ -97,7 +97,7 @@
   <li>dispatch_barrier_async(concurrent_queue, ^{// 写操作});</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// dispatch_queue_t concurrent = dispatch_queue_create(“concurrent_queue", DISPATCH_QUEUE_CONCURRENT);
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// dispatch_queue_t concurrent = dispatch_queue_create(“concurrent_queue", DISPATCH_QUEUE_CONCURRENT);
 
 - (id)objectForKey: (NSString *)key
 {
@@ -123,7 +123,7 @@
 <img src="http://files.pandaleo.cn/31f873ba180d2039b478c5557ce40ff9.png?imageMogr2/thumbnail/!40p" alt="" /></li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_group_t group = dispatch_group_create();
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_group_t group = dispatch_group_create();
 
 {
     for (NSURL *url in arrayURLs) {
@@ -181,7 +181,7 @@
   <li>对被修饰对象进行原子操作（不负责使用）</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@property(atomic) NSMutableArray *array;
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@property(atomic) NSMutableArray *array;
 self.array = [NSMutableArray array]; // 可以保证线程安全
 [self.array addObject: obc]; // 无法保证
 </code></pre></div></div>
@@ -209,7 +209,7 @@ self.array = [NSMutableArray array]; // 可以保证线程安全
   <li>dispatch_semaphore_create(1);</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct semaphore {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct semaphore {
     int value;
     List &lt;thread&gt;;
 }
@@ -218,7 +218,7 @@ self.array = [NSMutableArray array]; // 可以保证线程安全
   <li>dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_semaphore_wait()
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_semaphore_wait()
 {
     S.value = S.value - 1;
     if S.value &lt; 0 then Block(S.List); // 阻塞是一个主动行为
@@ -228,7 +228,7 @@ self.array = [NSMutableArray array]; // 可以保证线程安全
   <li>dispatch_semaphore_signal(semaphore)</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_semaphore_signal()
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_semaphore_signal()
 {
     S.value = S.value + 1;
     if S.value &lt; 0 then wakeup(S.List); // 唤醒是一个被动行为，由释放信号量的线程唤醒

@@ -1,6 +1,6 @@
-I"�<h4 id="1-method-swizzling替换方法">1. Method-Swizzling替换方法</h4>
+I"�<h4 id="1-method-swizzling替换方法">1. Method-Swizzling替换方法</h4>
 <p><img src="http://files.pandaleo.cn/a9f86d402d7fb07f303f40795465c81e.png" alt="" /></p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (void)load {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (void)load {
     Method test = class_getInstanceMethod(self, @selector(test));
     Method otherTest = class_getInstanceMethod(self, @selector(otherTest));
     method_exchangeImplementations(test, otherTest);
@@ -23,7 +23,7 @@
   <li>performSelector:</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void testImp (void) { }
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void testImp (void) { }
 + (BOOL)resolveInstanceMethod:(SEL)sel {
     class_addMethod(self, @selector(test), testImp, “v@:”);
 }

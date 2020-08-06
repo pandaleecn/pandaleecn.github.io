@@ -1,9 +1,9 @@
-I"<h3 id="1-字符串反转">1. 字符串反转</h3>
+I"�<h3 id="1-字符串反转">1. 字符串反转</h3>
 <ul>
   <li>给定字符串“hello, world”，实现将其反转</li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> void char_reverse(char* cha)
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> void char_reverse(char* cha)
 {
     char* begin = cha;
     cahr* end = cha + strlen(char) - 1;
@@ -18,7 +18,7 @@
 </code></pre></div></div>
 
 <h3 id="2-链表反转">2. 链表反转</h3>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>while (p != NULL) {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>while (p != NULL) {
     struct Node *temp = p-&gt;next;
     p-&gt;next = newH;
     newH = p;
@@ -26,7 +26,7 @@
 }
 </code></pre></div></div>
 <h3 id="3-有序数组合并">3. 有序数组合并</h3>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>while (p &lt; aLen &amp;&amp; q &lt; bLen) {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>while (p &lt; aLen &amp;&amp; q &lt; bLen) {
     if (a[p] &lt; b[q]) {
         result[i] = a[p];
         p++;
@@ -58,7 +58,7 @@
   </li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>char* p = cha;
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>char* p = cha;
 while (*p != ‘\0’) {
     array[*(p++)]++;
 }
@@ -88,7 +88,7 @@ return result;
   </li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 返回所有父视图
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 返回所有父视图
 while (temp) {
     [result addObject:temp];
     temp = temp.superview;
@@ -139,7 +139,7 @@ while (i &lt; MIN((int)arrayOne.count, (int)arrayOther.count)) {
   </li>
 </ul>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int PartSort()
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int PartSort()
 {
 
     low = start;
