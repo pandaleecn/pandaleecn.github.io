@@ -1,9 +1,0 @@
-Configuration file: /Users/lidapeng/Desktop/pandaleecn.github.io/_config.yml
-            Source: /Users/lidapeng/Desktop/pandaleecn.github.io
-       Destination: /Users/lidapeng/Desktop/pandaleecn.github.io/_site
- Incremental build: disabled. Enable with --incremental
-      Generating... 
-                    done in 1.555 seconds.
- Auto-regeneration: enabled for '/Users/lidapeng/Desktop/pandaleecn.github.io'
-    Server address: http://127.0.0.1:4000/
-  Server running... press ctrl-c to stop.
