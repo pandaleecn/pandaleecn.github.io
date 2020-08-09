@@ -1,8 +1,0 @@
-I"Q<p>在新闻和资讯类App中，经常会遇到需要数据源同步的场景。<br />
-<img src="http://files.pandaleo.cn/f472037a4f9a8b5145549c8464c40b4f.png" alt="" />
-常见的解决方案分为以下两种：</p>
-<h5 id="1-并发访问数据拷贝存在额外开销">1. 并发访问、数据拷贝，存在额外开销</h5>
-<p><img src="http://files.pandaleo.cn/98fc1080e4f4bd0095c545318ce31e99.png" alt="" /></p>
-<h5 id="2-串行访问存在刷新延迟">2. 串行访问，存在刷新延迟</h5>
-<p><img src="http://files.pandaleo.cn/011a7c171c5ee22884e7fe9410694e1f.png" alt="" /></p>
-:ET

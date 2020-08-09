@@ -1,8 +1,0 @@
-I"<h3 id="一-kvo">一、 KVO</h3>
-<h4 id="1-定义">1. 定义</h4>
-<ul>
-  <li>KVO是key-value observing的缩写。</li>
-  <li>KVO是Objective-C对观察者设计模式的又一实现。</li>
-  <li>Apple使用isa混写（isa-swizzling）来实现KVO。</li>
-</ul>
-:ET

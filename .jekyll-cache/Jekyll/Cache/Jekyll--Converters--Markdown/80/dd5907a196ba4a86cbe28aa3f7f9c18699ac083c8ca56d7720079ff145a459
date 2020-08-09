@@ -1,9 +1,0 @@
-I"<h3 id="一数组">一、数组</h3>
-<h4 id="1-数组和可变性">1. 数组和可变性</h4>
-<p>```
-let fibs = [0, 1, 1, 2, 3, 5]
-var mutableFibs = [0, 1, 1, 2, 3, 5]
-mutableFibs.append(8)
-mutableFibs.append(contentsOf: [13, 21])
-mutableFibs // [0, 1, 1, 2, 3, 5, 8, 13, 21]</p>
-:ET
