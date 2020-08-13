@@ -21,22 +21,25 @@ tags: iOS 网络
   - GET 参数长度限制 2048 个字符，POST 一般没有该限制
   - GET 请求不安全，POST 请求比较安全
 
-              * 从语义的角度总结。语义：协议定义规范，语法：具体实现路径。
-                  * GET：获取资源
-                      * 安全的
-                      * 幂等的
-                      * 可缓存的
+    - 从语义的角度总结。语义：协议定义规范，语法：具体实现路径。
 
-                  * POST：处理资源
-                      * 非安全的
-                      * 非幂等的
-                      * 不可缓存的
+      - GET：获取资源
 
-                  * 安全性：不应该引起Server端的任何状态变化。GET、HEAD、OPTIONS。
-                  * 幂等性：同一个请求方法执行多次和执行一次的效果完全相同。PUT、DELETE。
-                  * 可缓存性：请求是否可以缓存。GET、HEAD。
+        - 安全的
+        - 幂等的
+        - 可缓存的
 
-          * HEAD、PUT、DELETE、OPTIONS
+      - POST：处理资源
+
+        - 非安全的
+        - 非幂等的
+        - 不可缓存的
+
+      - 安全性：不应该引起 Server 端的任何状态变化。GET、HEAD、OPTIONS。
+      - 幂等性：同一个请求方法执行多次和执行一次的效果完全相同。PUT、DELETE。
+      - 可缓存性：请求是否可以缓存。GET、HEAD。
+
+    - HEAD、PUT、DELETE、OPTIONS
 
     - URL：地址
     - 协议版本：v1.1
@@ -72,9 +75,10 @@ tags: iOS 网络
   - time：20，20s 以内不会进行四次挥手关闭，20s 以内可以复用 TCP 连接
   - max：10，这条连接最多可以发生的 HTTP 请求/响应对
 
-          * 怎样判断一个请求是否结束？
-              * Content-length：1024，响应报文头部字段，响应数据字节数到达Content-length，说明HTTP请求响应接收完毕，HTTP请求结束。
-              * chunked，结束时最后会有一个空的chunked。
+    - 怎样判断一个请求是否结束？
+
+      - Content-length：1024，响应报文头部字段，响应数据字节数到达 Content-length，说明 HTTP 请求响应接收完毕，HTTP 请求结束。
+      - chunked，结束时最后会有一个空的 chunked。
 
     - Charles 抓包原理
       - 中间人攻击，利用 HTTP 中间人攻击的漏洞实现的。
@@ -139,12 +143,13 @@ tags: iOS 网络
   ![](http://files.pandaleo.cn/06b739c454203e81ccf3c7e46928806a.png?imageMogr2/thumbnail/!68p)
   当 SYN 发送超时，如果没有三次握手，会直接建立连接。再次收到超时重传策略的 SYN 时，会建立两次 TCP 连接。
 
-      * 四次挥手。数据传输结束之后，需要释放连接。
+- 四次挥手。数据传输结束之后，需要释放连接。
 
   ![](http://files.pandaleo.cn/1cbde76f277489286e81063b29977621.png?imageMogr2/thumbnail/!68p)
   TCP 通道全双工，双方都可以进行发送和回复，所以需要双方关闭。
 
 - 可靠传输
+
   - 无差错、不丢失、不重复、按序到达
   - 停止等待协议
   - 无差错情况
@@ -159,13 +164,13 @@ tags: iOS 网络
   - 确认迟到  
     ![](http://files.pandaleo.cn/a6fd3fda07f653d4601e683a830899b3.png?imageMogr2/thumbnail/!68p)
 
-* 面向字节流
+- 面向字节流
   ![](http://files.pandaleo.cn/aa75fc8a7aa102e39073e8ad5398c4e0.png?imageMogr2/thumbnail/!68p)
 
   - 发送方和接收方都有缓冲区，发送方通过 TCP 连接通道传递给接收方。
   - 发送方发送数据到缓冲区时，具体发送字节由 TCP 自行控制划分。如：H56、H789。
 
-* 流量控制
+- 流量控制
 
   - 滑动窗口协议
     ![](http://files.pandaleo.cn/a4e93a9de8e55ad58c62a33ea653ba98.png?imageMogr2/thumbnail/!68p)
@@ -178,7 +183,7 @@ tags: iOS 网络
   - 接收窗口大小受限于接收缓存，可以通过报文首部中的接收窗口值反向制约发送方发送窗口大小，控制发送速率。
   - 按序到达可通过字节序号进行控制
 
-* 拥塞控制
+- 拥塞控制
 
   - 慢开始、拥塞避免
     ![](http://files.pandaleo.cn/bd95edbcf09f3ba32dd9089b731c0203.png?imageMogr2/thumbnail/!68p)
@@ -209,6 +214,7 @@ tags: iOS 网络
 
 - DNS 劫持
   ![](http://files.pandaleo.cn/10025d3adbbcd8ba88d2bfa3f9d7758e.png?imageMogr2/thumbnail/!68p)
+
   - 客户端询问本地 DNS 服务器时，由于采用 UDP 明文传输，可能存在被窃听的风险。如果被钓鱼 DNS 劫持，可能会返回错误 IP，访问错误的 Server 上的网站。
   - DNS 劫持和 HTTP 没有关系，建立在连接之前，使用 UDP 数据包，端口号 53。
   - 解决方案
@@ -220,7 +226,7 @@ tags: iOS 网络
     ![](http://files.pandaleo.cn/275399f39d470f168ce9e4e9ad2f630e.png?imageMogr2/thumbnail/!68p)
     在客户端和 APIServer 之间建立长连 Sever（代理服务器），客户端和长连 Sever 建立 TCP 长连通道，通过内网专线进行 http 请求和响应。
 
-* NDS 解析转发
+- NDS 解析转发
   ![](http://files.pandaleo.cn/a9643d8ca6ded6eecea4f2257744cf13.png?imageMogr2/thumbnail/!68p)
   - 客户端请求时，运营商 DNS 服务器为了节省资源，请求其他 DNS 服务器，之后请求权威 DNS。
   - 权威 DNS 中根据不同运营商请求，针对不同网络的流量分发，返回代理 DNS 对应的 IP，出现跨网访问场景，造成请求缓慢的效率问题。
