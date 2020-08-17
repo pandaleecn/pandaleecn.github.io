@@ -5,62 +5,88 @@
  * @author ocodia
  */
 
-code[class*="language-"],
-pre[class*="language-"] {
-	color: #f8f8f2;
-	background: none;
-	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
-	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-	text-align: left;
-	white-space: pre;
-	word-spacing: normal;
-	word-break: normal;
-	word-wrap: normal;
-	line-height: 1.5;
+code[class*='language-'],
+pre[class*='language-'] {
+  color: #f8f8f2;
+  background: none;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
 
-	-moz-tab-size: 4;
-	-o-tab-size: 4;
-	tab-size: 4;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
 
-	-webkit-hyphens: none;
-	-moz-hyphens: none;
-	-ms-hyphens: none;
-	hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+#backtop a {
+  /* back to top button */
+  text-align: center;
+  line-height: 50px;
+  font-size: 16px;
+  width: 50px;
+  height: 50px;
+  position: fixed;
+  bottom: 10px; /* 小按钮到浏览器底边的距离 */
+  right: 60px; /* 小按钮到浏览器右边框的距离 */
+  color: rgb(64, 120, 192); /* 小按钮中文字的颜色 */
+  z-index: 1000;
+  background: #fff; /* 小按钮底色 */
+  padding: auto; /* 小按钮中文字到按钮边缘的距离 */
+  border-radius: 50px; /* 小按钮圆角的弯曲程度（半径）*/
+  -moz-border-radius: 50px;
+  -webkit-border-radius: 50px;
+  font-weight: bold; /* 小按钮中文字的粗细 */
+  text-decoration: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 1px 0 #ffffff inset;
 }
 
+#backtop a:hover {
+  /* 小按钮上有鼠标悬停时 */
+  background: rgba(64, 120, 192, 0.8); /* 小按钮的底色 */
+  color: #fff; /* 文字颜色 */
+}
 /* Code blocks */
-pre[class*="language-"] {
-	padding: 1em;
-	margin: .5em 0;
-	overflow: auto;
-	border-radius: 0.3em;
+pre[class*='language-'] {
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
 }
 
-:not(pre) > code[class*="language-"],
-pre[class*="language-"] {
-	background: #272822;
+:not(pre) > code[class*='language-'],
+pre[class*='language-'] {
+  background: #272822;
 }
 
 /* Inline code */
-:not(pre) > code[class*="language-"] {
-	padding: .1em;
-	border-radius: .3em;
-	white-space: normal;
+:not(pre) > code[class*='language-'] {
+  padding: 0.1em;
+  border-radius: 0.3em;
+  white-space: normal;
 }
 
 .token.comment,
 .token.prolog,
 .token.doctype,
 .token.cdata {
-	color: slategray;
+  color: slategray;
 }
 
 .token.punctuation {
-	color: #f8f8f2;
+  color: #f8f8f2;
 }
 
 .namespace {
-	opacity: .7;
+  opacity: 0.7;
 }
 
 .token.property,
@@ -68,12 +94,12 @@ pre[class*="language-"] {
 .token.constant,
 .token.symbol,
 .token.deleted {
-	color: #f92672;
+  color: #f92672;
 }
 
 .token.boolean,
 .token.number {
-	color: #ae81ff;
+  color: #ae81ff;
 }
 
 .token.selector,
@@ -82,7 +108,7 @@ pre[class*="language-"] {
 .token.char,
 .token.builtin,
 .token.inserted {
-	color: #a6e22e;
+  color: #a6e22e;
 }
 
 .token.operator,
@@ -91,33 +117,32 @@ pre[class*="language-"] {
 .language-css .token.string,
 .style .token.string,
 .token.variable {
-	color: #f8f8f2;
+  color: #f8f8f2;
 }
 
 .token.atrule,
 .token.attr-value,
 .token.function {
-	color: #e6db74;
+  color: #e6db74;
 }
 
 .token.keyword {
-	color: #66d9ef;
+  color: #66d9ef;
 }
 
 .token.regex,
 .token.important {
-	color: #fd971f;
+  color: #fd971f;
 }
 
 .token.important,
 .token.bold {
-	font-weight: bold;
+  font-weight: bold;
 }
 .token.italic {
-	font-style: italic;
+  font-style: italic;
 }
 
 .token.entity {
-	cursor: help;
+  cursor: help;
 }
-
